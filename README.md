@@ -169,18 +169,16 @@ tras recortar espacios, o la fecha/hora/confirmado no puedan interpretarse.
 ## Git y repositorio remoto
 
 El proyecto ya está inicializado como repositorio Git local con commits por etapa. Para
-crear el repo remoto en GitHub y subir el código (reemplazá `<tu-usuario>` y elegí
-público o privado según corresponda):
+crear el repo remoto en GitHub (usuario `Luismcbo`) y subir el código:
 
 ```bash
-gh repo create <tu-usuario>/turnos-red --private --source=. --remote=origin
+gh repo create Luismcbo/turnos-red --private --source=. --remote=origin
 git push -u origin main
 ```
 
 O sin la CLI de GitHub, creando el repo manualmente desde github.com y luego:
 
 ```bash
-git remote add origin https://github.com/<tu-usuario>/turnos-red.git
-git branch -M main
+git remote add origin https://github.com/Luismcbo/turnos-red.git
 git push -u origin main
 ```
