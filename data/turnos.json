@@ -1,0 +1,66 @@
+[
+  {
+    "id": "102",
+    "paciente": "   Carlos Ruiz ",
+    "documento": 31654210,
+    "especialidad": "PEDIATRÍA",
+    "fecha": "14/08/2026",
+    "hora": "10.00",
+    "confirmado": "si"
+  },
+  {
+    "id": 103,
+    "paciente": "Marta Gomez",
+    "documento": "28901234",
+    "especialidad": "clinica medica",
+    "fecha": "2026-08-15",
+    "hora": "09:30",
+    "confirmado": true
+  },
+  {
+    "id": "104",
+    "paciente": "  Julian Perez",
+    "documento": 40112233,
+    "especialidad": "ODONTOLOGIA",
+    "fecha": "16/08/2026",
+    "hora": "14.30",
+    "confirmado": "no",
+    "observaciones": "Paciente con alergia a la lidocaina"
+  },
+  {
+    "id": "105",
+    "paciente": "Rocio Fernandez",
+    "documento": "35678901",
+    "especialidad": "Nutrición",
+    "fecha": "17/08/2026",
+    "hora": "11.15",
+    "confirmado": "SI"
+  },
+  {
+    "id": "0",
+    "paciente": "Registro invalido (id no positivo)",
+    "documento": 12345678,
+    "especialidad": "PEDIATRIA",
+    "fecha": "18/08/2026",
+    "hora": "08.00",
+    "confirmado": "no"
+  },
+  {
+    "id": "abc",
+    "paciente": "Registro invalido (id no numerico)",
+    "documento": 87654321,
+    "especialidad": "CLINICA MEDICA",
+    "fecha": "18/08/2026",
+    "hora": "09.00",
+    "confirmado": "no"
+  },
+  {
+    "id": "106",
+    "paciente": "",
+    "documento": 11223344,
+    "especialidad": "ODONTOLOGIA",
+    "fecha": "19/08/2026",
+    "hora": "10.45",
+    "confirmado": "no"
+  }
+]
