@@ -6,6 +6,9 @@ odontología, nutrición). Cada sede exporta un `turnos.json` con formato incons
 TurnosRed lo lee, **normaliza y valida** los datos, expone una API REST con CRUD y
 notifica en tiempo real por **Socket.IO** cada vez que se crea, actualiza o elimina un turno.
 
+📄 **Informe técnico** (depuración en VS Code, pruebas de los 5 endpoints en Postman y
+evidencia de Socket.IO en tiempo real): [docs/evidencia/informe-tecnico-turnosred.pdf](docs/evidencia/informe-tecnico-turnosred.pdf)
+
 ## Requisitos previos
 
 - [Node.js](https://nodejs.org/) LTS (versión indicada en [`.nvmrc`](.nvmrc); si usás `nvm`,
