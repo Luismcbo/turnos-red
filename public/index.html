@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TurnosRed - Cliente de prueba Socket.IO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 760px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
+      #estado {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+      }
+      #estado.conectado {
+        background: #14532d;
+        color: #bbf7d0;
+      }
+      #estado.desconectado {
+        background: #7f1d1d;
+        color: #fecaca;
+      }
+      #eventos {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+      }
+      .evento {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border-left: 4px solid #64748b;
+        background: #1e293b;
+      }
+      .evento.turno-nuevo {
+        border-left-color: #22c55e;
+      }
+      .evento.turno-actualizado {
+        border-left-color: #eab308;
+      }
+      .evento.turno-eliminado {
+        border-left-color: #ef4444;
+      }
+      .evento .titulo {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      .evento pre {
+        margin: 0;
+        white-space: pre-wrap;
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+      .hora {
+        font-size: 0.75rem;
+        color: #64748b;
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>TurnosRed · eventos en tiempo real</h1>
+    <span id="estado" class="desconectado">Desconectado</span>
+    <p>
+      Esta pagina se conecta por Socket.IO al servidor y muestra en vivo los eventos
+      <code>turno:nuevo</code>, <code>turno:actualizado</code> y <code>turno:eliminado</code> cada
+      vez que se hace POST/PUT/DELETE en <code>/turnos</code>. Sin polling.
+    </p>
+    <div id="eventos"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const estadoEl = document.getElementById('estado');
+      const eventosEl = document.getElementById('eventos');
+
+      const socket = io();
+
+      socket.on('connect', () => {
+        estadoEl.textContent = `Conectado (${socket.id})`;
+        estadoEl.className = 'conectado';
+      });
+
+      socket.on('disconnect', () => {
+        estadoEl.textContent = 'Desconectado';
+        estadoEl.className = 'desconectado';
+      });
+
+      function agregarEvento(tipo, claseCss, turno) {
+        const div = document.createElement('div');
+        div.className = `evento ${claseCss}`;
+        div.innerHTML = `
+          <span class="hora">${new Date().toLocaleTimeString()}</span>
+          <div class="titulo">${tipo}</div>
+          <pre>${JSON.stringify(turno, null, 2)}</pre>
+        `;
+        eventosEl.prepend(div);
+      }
+
+      socket.on('turno:nuevo', (turno) => agregarEvento('turno:nuevo', 'turno-nuevo', turno));
+      socket.on('turno:actualizado', (turno) =>
+        agregarEvento('turno:actualizado', 'turno-actualizado', turno),
+      );
+      socket.on('turno:eliminado', (turno) =>
+        agregarEvento('turno:eliminado', 'turno-eliminado', turno),
+      );
+    </script>
+  </body>
+</html>
