@@ -1,0 +1,2556 @@
+{
+  "info": {
+    "_postman_id": "97172a6b-f3ac-4cc5-a0ac-e221b60d2b03",
+    "name": "TurnosRed API",
+    "description": "Coleccion de la Actividad 2 de TurnosRed (Turnos + Médicos).\n\n- Importar junto con `turnos-red.postman_environment.json` y seleccionar el environment \"TurnosRed - Local\".\n- Ejecutar con el Collection Runner en orden: la carpeta 1 crea un médico (guarda `medicoId`), la 2 crea un turno vinculado (guarda `turnoId`) y la 3 limpia.\n- Cada request incluye tests (status code + esquema JSON) y un ejemplo guardado (Saved Response) listo para usarse como Mock Server.\n- Formato de error de toda la API: `{ \"status\", \"message\", \"code\", \"details\": [] }`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Médicos",
+      "description": "CRUD del recurso Médico: happy path, filtros y casos de error (400/404).",
+      "item": [
+        {
+          "name": "POST /medicos - Crear médico (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const MEDICO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidad\",\"disponible\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"disponible\":{\"type\":\"boolean\"},\"email\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "// Guarda la variable en el environment (pedido de la consigna) y tambien como variable de",
+                  "// coleccion, asi los tests siguen en verde aunque no haya un environment seleccionado.",
+                  "function saveVar(name, value) {",
+                  "    pm.environment.set(name, value);",
+                  "    pm.collectionVariables.set(name, value);",
+                  "}",
+                  "",
+                  "pm.test('Status code es 201 (Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Responde en menos de 1000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Médico', function () {",
+                  "    pm.response.to.have.jsonSchema(MEDICO_SCHEMA);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Refleja los datos enviados', function () {",
+                  "    pm.expect(body.nombre).to.eql('Julia');",
+                  "    pm.expect(body.especialidad).to.eql('Pediatría');",
+                  "    pm.expect(body.disponible).to.eql(true);",
+                  "});",
+                  "saveVar('medicoId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"MP-2001\",\n  \"especialidad\": \"Pediatría\",\n  \"disponible\": true,\n  \"email\": \"julia.fernandez@turnosred.test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"MP-2001\",\n  \"especialidad\": \"Pediatría\",\n  \"disponible\": true,\n  \"email\": \"julia.fernandez@turnosred.test\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/medicos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 6,\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"MP-2001\",\n  \"especialidad\": \"Pediatría\",\n  \"disponible\": true,\n  \"email\": \"julia.fernandez@turnosred.test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /medicos - Listar médicos (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const MEDICO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidad\",\"disponible\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"disponible\":{\"type\":\"boolean\"},\"email\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Es un arreglo no vacío de Médicos con el esquema correcto', function () {",
+                  "    pm.response.to.have.jsonSchema({ type: 'array', minItems: 1, items: MEDICO_SCHEMA });",
+                  "});",
+                  "pm.test('Incluye el médico creado en este flujo', function () {",
+                  "    const id = Number(pm.variables.get('medicoId'));",
+                  "    pm.expect(pm.response.json().map(function (m) { return m.id; })).to.include(id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 1,\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Benítez\",\n    \"matricula\": \"MP-1001\",\n    \"especialidad\": \"Pediatría\",\n    \"disponible\": true,\n    \"email\": \"laura.benitez@turnosred.test\"\n  },\n  {\n    \"id\": 2,\n    \"nombre\": \"Martín\",\n    \"apellido\": \"Suárez\",\n    \"matricula\": \"MP-1002\",\n    \"especialidad\": \"Odontología\",\n    \"disponible\": true,\n    \"email\": \"martin.suarez@turnosred.test\"\n  },\n  {\n    \"id\": 3,\n    \"nombre\": \"Sofía\",\n    \"apellido\": \"Ledesma\",\n    \"matricula\": \"MP-1003\",\n    \"especialidad\": \"Nutrición\",\n    \"disponible\": false\n  },\n  {\n    \"id\": 4,\n    \"nombre\": \"Ricardo\",\n    \"apellido\": \"Paz\",\n    \"matricula\": \"MP-1004\",\n    \"especialidad\": \"Clínica médica\",\n    \"disponible\": true\n  },\n  {\n    \"id\": 5,\n    \"nombre\": \"Ana\",\n    \"apellido\": \"Rossi\",\n    \"matricula\": \"MP-1005\",\n    \"especialidad\": \"Pediatría\",\n    \"disponible\": false,\n    \"email\": \"ana.rossi@turnosred.test\"\n  },\n  {\n    \"id\": 6,\n    \"nombre\": \"Julia\",\n    \"apellido\": \"Fernández\",\n    \"matricula\": \"MP-2001\",\n    \"especialidad\": \"Pediatría\",\n    \"disponible\": true,\n    \"email\": \"julia.fernandez@turnosred.test\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /medicos?especialidad&disponible - Filtrar médicos (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Todos los resultados son Pediatría y disponibles', function () {",
+                  "    const list = pm.response.json();",
+                  "    pm.expect(list).to.be.an(\"array\");",
+                  "    list.forEach(function (m) { pm.expect(m.especialidad).to.eql('Pediatría'); pm.expect(m.disponible).to.eql(true); });",
+                  "});",
+                  "pm.test('Incluye al médico creado (disponible por defecto)', function () {",
+                  "    const id = Number(pm.variables.get('medicoId'));",
+                  "    pm.expect(pm.response.json().map(function (m) { return m.id; })).to.include(id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos?especialidad=Pediatria&disponible=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos"],
+              "query": [
+                {
+                  "key": "especialidad",
+                  "value": "Pediatria",
+                  "description": "Tolera mayúsculas y tildes en filtros"
+                },
+                {
+                  "key": "disponible",
+                  "value": "true",
+                  "description": "\"true\" o \"false\""
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos?especialidad=Pediatria&disponible=true",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos"],
+                  "query": [
+                    {
+                      "key": "especialidad",
+                      "value": "Pediatria"
+                    },
+                    {
+                      "key": "disponible",
+                      "value": "true"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 1,\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Benítez\",\n    \"matricula\": \"MP-1001\",\n    \"especialidad\": \"Pediatría\",\n    \"disponible\": true,\n    \"email\": \"laura.benitez@turnosred.test\"\n  },\n  {\n    \"id\": 6,\n    \"nombre\": \"Julia\",\n    \"apellido\": \"Fernández\",\n    \"matricula\": \"MP-2001\",\n    \"especialidad\": \"Pediatría\",\n    \"disponible\": true,\n    \"email\": \"julia.fernandez@turnosred.test\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /medicos/:id - Obtener médico (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const MEDICO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidad\",\"disponible\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"disponible\":{\"type\":\"boolean\"},\"email\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Médico', function () {",
+                  "    pm.response.to.have.jsonSchema(MEDICO_SCHEMA);",
+                  "});",
+                  "pm.test('El id coincide con el solicitado', function () {",
+                  "    pm.expect(pm.response.json().id).to.eql(Number(pm.variables.get('medicoId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos/{{medicoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "{{medicoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "6"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 6,\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"MP-2001\",\n  \"especialidad\": \"Pediatría\",\n  \"disponible\": true,\n  \"email\": \"julia.fernandez@turnosred.test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /medicos/:id - Actualizar médico (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const MEDICO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidad\",\"disponible\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"disponible\":{\"type\":\"boolean\"},\"email\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Médico', function () {",
+                  "    pm.response.to.have.jsonSchema(MEDICO_SCHEMA);",
+                  "});",
+                  "pm.test('Aplica solo los cambios enviados', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.matricula).to.eql('MP-2001-B');",
+                  "    pm.expect(body.disponible).to.eql(false);",
+                  "    pm.expect(body.nombre).to.eql('Julia');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"MP-2001-B\",\n  \"disponible\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medicos/{{medicoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "{{medicoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"matricula\": \"MP-2001-B\",\n  \"disponible\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/medicos/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "6"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 6,\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"MP-2001-B\",\n  \"especialidad\": \"Pediatría\",\n  \"disponible\": false,\n  \"email\": \"julia.fernandez@turnosred.test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /medicos - Especialidad \"PEDIATRÍA\" mal escrita (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details indica el campo \"especialidad\" (body)', function () {",
+                  "    const d = err.details.find(function (x) { return x.field === 'especialidad'; });",
+                  "    pm.expect(d, 'detalle para especialidad').to.exist;",
+                  "    pm.expect(d.location).to.eql('body');",
+                  "    pm.expect(d.message).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.test('El mensaje explica los valores permitidos', function () {",
+                  "    pm.expect(err.details[0].message).to.include('exactamente').and.include('Pediatría');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"MP-2002\",\n  \"especialidad\": \"PEDIATRÍA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"MP-2002\",\n  \"especialidad\": \"PEDIATRÍA\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/medicos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidad\",\n      \"message\": \"Debe ser exactamente uno de: \\\"Clínica médica\\\", \\\"Pediatría\\\", \\\"Odontología\\\", \\\"Nutrición\\\" (respetando mayúsculas y tildes)\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /medicos - Campos inválidos y faltantes (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: nombre, apellido, matricula, especialidad, email', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"nombre\",\"apellido\",\"matricula\",\"especialidad\",\"email\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"email\": \"no-es-un-mail\",\n  \"especialidad\": \"Cardiología\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"\",\n  \"email\": \"no-es-un-mail\",\n  \"especialidad\": \"Cardiología\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/medicos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (5 errores)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"nombre\",\n      \"message\": \"No puede estar vacío\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"apellido\",\n      \"message\": \"Entrada inválida: se esperaba texto, recibido indefinido\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"matricula\",\n      \"message\": \"Entrada inválida: se esperaba texto, recibido indefinido\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidad\",\n      \"message\": \"Debe ser exactamente uno de: \\\"Clínica médica\\\", \\\"Pediatría\\\", \\\"Odontología\\\", \\\"Nutrición\\\" (respetando mayúsculas y tildes)\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"email\",\n      \"message\": \"Inválido dirección de correo electrónico\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /medicos?disponible=quizas - Filtro inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details indica el campo \"disponible\" (query)', function () {",
+                  "    const d = err.details.find(function (x) { return x.field === 'disponible'; });",
+                  "    pm.expect(d, 'detalle para disponible').to.exist;",
+                  "    pm.expect(d.location).to.eql('query');",
+                  "    pm.expect(d.message).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos?disponible=quizas",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos"],
+              "query": [
+                {
+                  "key": "disponible",
+                  "value": "quizas"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos?disponible=quizas",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos"],
+                  "query": [
+                    {
+                      "key": "disponible",
+                      "value": "quizas"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"query\",\n      \"field\": \"disponible\",\n      \"message\": \"Debe ser \\\"true\\\" o \\\"false\\\"\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /medicos/abc - Id no numérico (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details indica el campo \"id\" (params)', function () {",
+                  "    const d = err.details.find(function (x) { return x.field === 'id'; });",
+                  "    pm.expect(d, 'detalle para id').to.exist;",
+                  "    pm.expect(d.location).to.eql('params');",
+                  "    pm.expect(d.message).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "abc"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos/abc",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "abc"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"params\",\n      \"field\": \"id\",\n      \"message\": \"Debe ser un entero positivo\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /medicos/:id - Médico inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('details vacío en un NOT_FOUND', function () { pm.expect(err.details).to.be.an('array').that.is.empty; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un medico con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /medicos/:id - Médico inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"disponible\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medicos/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"disponible\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/medicos/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un medico con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Turnos",
+      "description": "CRUD del recurso Turno vinculado al médico creado en la carpeta anterior (medicoId).",
+      "item": [
+        {
+          "name": "POST /turnos - Crear turno con médico (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const TURNO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"paciente\",\"documento\",\"especialidad\",\"fecha\",\"hora\",\"confirmado\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"paciente\":{\"type\":\"string\",\"minLength\":1},\"documento\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"fecha\":{\"type\":\"string\",\"pattern\":\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\"},\"hora\":{\"type\":\"string\",\"pattern\":\"^([01]\\\\d|2[0-3]):[0-5]\\\\d$\"},\"confirmado\":{\"type\":\"boolean\"},\"observaciones\":{\"type\":\"string\"},\"medicoId\":{\"type\":\"integer\",\"minimum\":1}},\"additionalProperties\":false};",
+                  "// Guarda la variable en el environment (pedido de la consigna) y tambien como variable de",
+                  "// coleccion, asi los tests siguen en verde aunque no haya un environment seleccionado.",
+                  "function saveVar(name, value) {",
+                  "    pm.environment.set(name, value);",
+                  "    pm.collectionVariables.set(name, value);",
+                  "}",
+                  "",
+                  "pm.test('Status code es 201 (Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Responde en menos de 1000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Turno', function () {",
+                  "    pm.response.to.have.jsonSchema(TURNO_SCHEMA);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Normaliza los datos (paciente, fecha ISO, hora HH:mm)', function () {",
+                  "    pm.expect(body.paciente).to.eql('Carlos Ruiz');",
+                  "    pm.expect(body.documento).to.eql('31.654.210');",
+                  "    pm.expect(body.fecha).to.eql('2026-08-14');",
+                  "    pm.expect(body.hora).to.eql('10:00');",
+                  "});",
+                  "pm.test('Queda vinculado al médico (medicoId)', function () {",
+                  "    pm.expect(body.medicoId).to.eql(Number(pm.variables.get('medicoId')));",
+                  "});",
+                  "saveVar('turnoId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paciente\": \"  Carlos   Ruiz \",\n  \"documento\": \"31.654.210\",\n  \"especialidad\": \"Pediatría\",\n  \"fecha\": \"14/08/2026\",\n  \"hora\": \"10.00\",\n  \"confirmado\": true,\n  \"medicoId\": {{medicoId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paciente\": \"  Carlos   Ruiz \",\n  \"documento\": \"31.654.210\",\n  \"especialidad\": \"Pediatría\",\n  \"fecha\": \"14/08/2026\",\n  \"hora\": \"10.00\",\n  \"confirmado\": true,\n  \"medicoId\": 6\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 106,\n  \"paciente\": \"Carlos Ruiz\",\n  \"documento\": \"31.654.210\",\n  \"especialidad\": \"Pediatría\",\n  \"fecha\": \"2026-08-14\",\n  \"hora\": \"10:00\",\n  \"confirmado\": true,\n  \"medicoId\": 6\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /turnos - Listar turnos (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const TURNO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"paciente\",\"documento\",\"especialidad\",\"fecha\",\"hora\",\"confirmado\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"paciente\":{\"type\":\"string\",\"minLength\":1},\"documento\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"fecha\":{\"type\":\"string\",\"pattern\":\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\"},\"hora\":{\"type\":\"string\",\"pattern\":\"^([01]\\\\d|2[0-3]):[0-5]\\\\d$\"},\"confirmado\":{\"type\":\"boolean\"},\"observaciones\":{\"type\":\"string\"},\"medicoId\":{\"type\":\"integer\",\"minimum\":1}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Es un arreglo no vacío de Turnos con el esquema correcto', function () {",
+                  "    pm.response.to.have.jsonSchema({ type: 'array', minItems: 1, items: TURNO_SCHEMA });",
+                  "});",
+                  "pm.test('Incluye el turno creado en este flujo', function () {",
+                  "    const id = Number(pm.variables.get('turnoId'));",
+                  "    pm.expect(pm.response.json().map(function (t) { return t.id; })).to.include(id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 102,\n    \"paciente\": \"Carlos Ruiz\",\n    \"documento\": \"31654210\",\n    \"especialidad\": \"Pediatría\",\n    \"fecha\": \"2026-08-14\",\n    \"hora\": \"10:00\",\n    \"confirmado\": true,\n    \"medicoId\": 1\n  },\n  {\n    \"id\": 103,\n    \"paciente\": \"Marta Gomez\",\n    \"documento\": \"28901234\",\n    \"especialidad\": \"Clínica médica\",\n    \"fecha\": \"2026-08-15\",\n    \"hora\": \"09:30\",\n    \"confirmado\": true,\n    \"medicoId\": 4\n  },\n  {\n    \"id\": 104,\n    \"paciente\": \"Julian Perez\",\n    \"documento\": \"40112233\",\n    \"especialidad\": \"Odontología\",\n    \"fecha\": \"2026-08-16\",\n    \"hora\": \"14:30\",\n    \"confirmado\": false,\n    \"observaciones\": \"Paciente con alergia a la lidocaina\",\n    \"medicoId\": 2\n  },\n  {\n    \"id\": 105,\n    \"paciente\": \"Rocio Fernandez\",\n    \"documento\": \"35678901\",\n    \"especialidad\": \"Nutrición\",\n    \"fecha\": \"2026-08-17\",\n    \"hora\": \"11:15\",\n    \"confirmado\": true,\n    \"medicoId\": 3\n  },\n  {\n    \"id\": 106,\n    \"paciente\": \"Carlos Ruiz\",\n    \"documento\": \"31.654.210\",\n    \"especialidad\": \"Pediatría\",\n    \"fecha\": \"2026-08-14\",\n    \"hora\": \"10:00\",\n    \"confirmado\": true,\n    \"medicoId\": 6\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /turnos?especialidad&fecha&medicoId - Filtrar turnos (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Solo devuelve turnos que cumplen los tres filtros', function () {",
+                  "    const list = pm.response.json();",
+                  "    pm.expect(list).to.be.an(\"array\").that.is.not.empty;",
+                  "    list.forEach(function (t) {",
+                  "        pm.expect(t.especialidad).to.eql('Pediatría');",
+                  "        pm.expect(t.fecha).to.eql('2026-08-14');",
+                  "        pm.expect(t.medicoId).to.eql(Number(pm.variables.get('medicoId')));",
+                  "    });",
+                  "});",
+                  "pm.test('Incluye el turno creado', function () {",
+                  "    pm.expect(pm.response.json().map(function (t) { return t.id; })).to.include(Number(pm.variables.get('turnoId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos?especialidad=Pediatria&fecha=14/08/2026&medicoId={{medicoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"],
+              "query": [
+                {
+                  "key": "especialidad",
+                  "value": "Pediatria",
+                  "description": "Tolera mayúsculas y tildes en filtros"
+                },
+                {
+                  "key": "fecha",
+                  "value": "14/08/2026",
+                  "description": "DD/MM/YYYY o YYYY-MM-DD"
+                },
+                {
+                  "key": "medicoId",
+                  "value": "{{medicoId}}",
+                  "description": "Id del médico"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos?especialidad=Pediatria&fecha=14/08/2026&medicoId=6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"],
+                  "query": [
+                    {
+                      "key": "especialidad",
+                      "value": "Pediatria"
+                    },
+                    {
+                      "key": "fecha",
+                      "value": "14/08/2026"
+                    },
+                    {
+                      "key": "medicoId",
+                      "value": "6"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 106,\n    \"paciente\": \"Carlos Ruiz\",\n    \"documento\": \"31.654.210\",\n    \"especialidad\": \"Pediatría\",\n    \"fecha\": \"2026-08-14\",\n    \"hora\": \"10:00\",\n    \"confirmado\": true,\n    \"medicoId\": 6\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /turnos/:id - Obtener turno (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const TURNO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"paciente\",\"documento\",\"especialidad\",\"fecha\",\"hora\",\"confirmado\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"paciente\":{\"type\":\"string\",\"minLength\":1},\"documento\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"fecha\":{\"type\":\"string\",\"pattern\":\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\"},\"hora\":{\"type\":\"string\",\"pattern\":\"^([01]\\\\d|2[0-3]):[0-5]\\\\d$\"},\"confirmado\":{\"type\":\"boolean\"},\"observaciones\":{\"type\":\"string\"},\"medicoId\":{\"type\":\"integer\",\"minimum\":1}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Turno', function () {",
+                  "    pm.response.to.have.jsonSchema(TURNO_SCHEMA);",
+                  "});",
+                  "pm.test('El id coincide con el solicitado', function () {",
+                  "    pm.expect(pm.response.json().id).to.eql(Number(pm.variables.get('turnoId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos/{{turnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "{{turnoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos/106",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "106"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 106,\n  \"paciente\": \"Carlos Ruiz\",\n  \"documento\": \"31.654.210\",\n  \"especialidad\": \"Pediatría\",\n  \"fecha\": \"2026-08-14\",\n  \"hora\": \"10:00\",\n  \"confirmado\": true,\n  \"medicoId\": 6\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /turnos/:id - Actualizar turno (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const TURNO_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"paciente\",\"documento\",\"especialidad\",\"fecha\",\"hora\",\"confirmado\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"paciente\":{\"type\":\"string\",\"minLength\":1},\"documento\":{\"type\":\"string\",\"minLength\":1},\"especialidad\":{\"type\":\"string\",\"enum\":[\"Clínica médica\",\"Pediatría\",\"Odontología\",\"Nutrición\"]},\"fecha\":{\"type\":\"string\",\"pattern\":\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\"},\"hora\":{\"type\":\"string\",\"pattern\":\"^([01]\\\\d|2[0-3]):[0-5]\\\\d$\"},\"confirmado\":{\"type\":\"boolean\"},\"observaciones\":{\"type\":\"string\"},\"medicoId\":{\"type\":\"integer\",\"minimum\":1}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Turno', function () {",
+                  "    pm.response.to.have.jsonSchema(TURNO_SCHEMA);",
+                  "});",
+                  "pm.test('Aplica los cambios y conserva el resto', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.confirmado).to.eql(false);",
+                  "    pm.expect(body.hora).to.eql('15:30');",
+                  "    pm.expect(body.observaciones).to.eql('Reprogramado por el paciente');",
+                  "    pm.expect(body.paciente).to.eql('Carlos Ruiz');",
+                  "    pm.expect(body.medicoId).to.eql(Number(pm.variables.get('medicoId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmado\": false,\n  \"hora\": \"15.30\",\n  \"observaciones\": \"Reprogramado por el paciente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos/{{turnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "{{turnoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"confirmado\": false,\n  \"hora\": \"15.30\",\n  \"observaciones\": \"Reprogramado por el paciente\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos/106",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "106"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 106,\n  \"paciente\": \"Carlos Ruiz\",\n  \"documento\": \"31.654.210\",\n  \"especialidad\": \"Pediatría\",\n  \"fecha\": \"2026-08-14\",\n  \"hora\": \"15:30\",\n  \"confirmado\": false,\n  \"medicoId\": 6,\n  \"observaciones\": \"Reprogramado por el paciente\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /turnos - Especialidad \"PEDIATRÍA\" mal escrita (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details indica el campo \"especialidad\" (body)', function () {",
+                  "    const d = err.details.find(function (x) { return x.field === 'especialidad'; });",
+                  "    pm.expect(d, 'detalle para especialidad').to.exist;",
+                  "    pm.expect(d.location).to.eql('body');",
+                  "    pm.expect(d.message).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.test('Es el único error y explica los valores permitidos', function () {",
+                  "    pm.expect(err.details).to.have.lengthOf(1);",
+                  "    pm.expect(err.details[0].message).to.include('exactamente').and.include('Pediatría');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paciente\": \"Carlos Ruiz\",\n  \"documento\": \"31654210\",\n  \"especialidad\": \"PEDIATRÍA\",\n  \"fecha\": \"14/08/2026\",\n  \"hora\": \"10.00\",\n  \"confirmado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paciente\": \"Carlos Ruiz\",\n  \"documento\": \"31654210\",\n  \"especialidad\": \"PEDIATRÍA\",\n  \"fecha\": \"14/08/2026\",\n  \"hora\": \"10.00\",\n  \"confirmado\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidad\",\n      \"message\": \"Debe ser exactamente uno de: \\\"Clínica médica\\\", \\\"Pediatría\\\", \\\"Odontología\\\", \\\"Nutrición\\\" (respetando mayúsculas y tildes)\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /turnos - Múltiples campos inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: paciente, documento, especialidad, fecha, hora, confirmado, extra', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"paciente\",\"documento\",\"especialidad\",\"fecha\",\"hora\",\"confirmado\",\"extra\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paciente\": \"\",\n  \"documento\": 123,\n  \"especialidad\": \"pediatria\",\n  \"fecha\": \"31/02/2026\",\n  \"hora\": \"25:00\",\n  \"confirmado\": \"quizas\",\n  \"extra\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paciente\": \"\",\n  \"documento\": 123,\n  \"especialidad\": \"pediatria\",\n  \"fecha\": \"31/02/2026\",\n  \"hora\": \"25:00\",\n  \"confirmado\": \"quizas\",\n  \"extra\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (7 errores)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"paciente\",\n      \"message\": \"No puede estar vacío\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"documento\",\n      \"message\": \"Entrada inválida: se esperaba texto, recibido número\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidad\",\n      \"message\": \"Debe ser exactamente uno de: \\\"Clínica médica\\\", \\\"Pediatría\\\", \\\"Odontología\\\", \\\"Nutrición\\\" (respetando mayúsculas y tildes)\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"fecha\",\n      \"message\": \"Fecha inválida. Use DD/MM/YYYY o YYYY-MM-DD y una fecha real del calendario\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"hora\",\n      \"message\": \"Hora inválida. Use HH:mm o HH.mm (00:00 a 23:59)\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"confirmado\",\n      \"message\": \"Debe ser booleano (true/false) o \\\"si\\\"/\\\"no\\\"\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"extra\",\n      \"message\": \"Campo no permitido\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /turnos - medicoId inexistente (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details indica el campo \"medicoId\" (body)', function () {",
+                  "    const d = err.details.find(function (x) { return x.field === 'medicoId'; });",
+                  "    pm.expect(d, 'detalle para medicoId').to.exist;",
+                  "    pm.expect(d.location).to.eql('body');",
+                  "    pm.expect(d.message).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paciente\": \"Carlos Ruiz\",\n  \"documento\": \"31654210\",\n  \"especialidad\": \"Pediatría\",\n  \"fecha\": \"14/08/2026\",\n  \"hora\": \"10.00\",\n  \"medicoId\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paciente\": \"Carlos Ruiz\",\n  \"documento\": \"31654210\",\n  \"especialidad\": \"Pediatría\",\n  \"fecha\": \"14/08/2026\",\n  \"hora\": \"10.00\",\n  \"medicoId\": 999999\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"El medico indicado no existe\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"medicoId\",\n      \"message\": \"No existe un medico con id 999999\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /turnos - JSON mal formado (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=INVALID_JSON en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('INVALID_JSON');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"paciente\": \"Carlos Ruiz\", ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"paciente\": \"Carlos Ruiz\", ",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"El cuerpo de la peticion no es un JSON valido\",\n  \"code\": \"INVALID_JSON\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /turnos - Filtros inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: especialidad, fecha, medicoId', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"especialidad\",\"fecha\",\"medicoId\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('query'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos?especialidad=Cardiologia&fecha=32/13/2026&medicoId=abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos"],
+              "query": [
+                {
+                  "key": "especialidad",
+                  "value": "Cardiologia"
+                },
+                {
+                  "key": "fecha",
+                  "value": "32/13/2026"
+                },
+                {
+                  "key": "medicoId",
+                  "value": "abc"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos?especialidad=Cardiologia&fecha=32/13/2026&medicoId=abc",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos"],
+                  "query": [
+                    {
+                      "key": "especialidad",
+                      "value": "Cardiologia"
+                    },
+                    {
+                      "key": "fecha",
+                      "value": "32/13/2026"
+                    },
+                    {
+                      "key": "medicoId",
+                      "value": "abc"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (3 errores)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"query\",\n      \"field\": \"especialidad\",\n      \"message\": \"Especialidad desconocida. Valores admitidos (sin distinguir mayúsculas ni tildes): Clínica médica, Pediatría, Odontología, Nutrición\"\n    },\n    {\n      \"location\": \"query\",\n      \"field\": \"fecha\",\n      \"message\": \"Fecha inválida. Use DD/MM/YYYY o YYYY-MM-DD y una fecha real del calendario\"\n    },\n    {\n      \"location\": \"query\",\n      \"field\": \"medicoId\",\n      \"message\": \"Debe ser un entero positivo\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /turnos/:id - Body vacío (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('Pide al menos un campo', function () { pm.expect(err.details[0].message).to.include('al menos un campo'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos/{{turnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "{{turnoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos/106",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "106"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La peticion contiene datos invalidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"(root)\",\n      \"message\": \"Debe enviar al menos un campo para actualizar\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /turnos/:id - Turno inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un turno con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /turnos/:id - Turno inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/turnos/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"confirmado\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/turnos/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un turno con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /turnos/:id - Eliminar turno (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 204 (No Content)', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('204 no devuelve cuerpo', function () { pm.expect(pm.response.text()).to.be.empty; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos/{{turnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "{{turnoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos/106",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "106"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "GET /turnos/:id - Turno ya eliminado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos/{{turnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "{{turnoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos/106",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "106"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un turno con id 106\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /turnos/:id - Eliminar dos veces (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turnos/{{turnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["turnos", "{{turnoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/turnos/106",
+                  "host": ["http://localhost:3000"],
+                  "path": ["turnos", "106"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un turno con id 106\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Limpieza y errores generales",
+      "description": "Elimina el médico creado (204) y verifica 404 y ruta inexistente con el formato estándar.",
+      "item": [
+        {
+          "name": "DELETE /medicos/:id - Eliminar médico (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 204 (No Content)', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('204 no devuelve cuerpo', function () { pm.expect(pm.response.text()).to.be.empty; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos/{{medicoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "{{medicoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "6"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "GET /medicos/:id - Médico ya eliminado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos/{{medicoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "{{medicoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "6"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un medico con id 6\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /medicos/:id - Eliminar dos veces (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/medicos/{{medicoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["medicos", "{{medicoId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/medicos/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["medicos", "6"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un medico con id 6\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /ruta-inexistente - Ruta no encontrada (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje menciona la ruta pedida', function () { pm.expect(err.message).to.include('/ruta-inexistente'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ruta-inexistente",
+              "host": ["{{baseUrl}}"],
+              "path": ["ruta-inexistente"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/ruta-inexistente",
+                  "host": ["http://localhost:3000"],
+                  "path": ["ruta-inexistente"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"Ruta no encontrada: GET /ruta-inexistente\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "medicoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "turnoId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

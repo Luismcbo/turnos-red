@@ -15,7 +15,8 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "demo:callback": "tsx src/legacy/readTurnosCallback.ts"
+    "demo:callback": "tsx src/legacy/readTurnosCallback.ts",
+    "test:postman": "npx --yes newman run postman/turnos-red.postman_collection.json -e postman/turnos-red.postman_environment.json"
   },
   "keywords": [
     "turnos",
