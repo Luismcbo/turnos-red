@@ -1,57 +1,31 @@
 import type { Request, Response } from 'express';
-import { AppError } from '../errors/AppError.js';
+import { validated } from '../middlewares/validate.js';
+import type { IdParam } from '../schemas/common.schema.js';
+import type { CreateTurnoBody, UpdateTurnoBody } from '../schemas/turno.schema.js';
 import * as turnoService from '../services/turno.service.js';
-import { normalizeTurnoFields } from '../utils/normalizers.js';
-import { validarBodyActualizacion, validarBodyCreacion } from '../utils/validarTurnoBody.js';
-
-const NORMALIZATION_ERROR =
-  'No se pudo normalizar el turno: revisar formato de fecha (DD/MM/YYYY o YYYY-MM-DD), ' +
-  'hora (HH:mm o HH.mm) y confirmado (boolean o "si"/"no")';
-
-function parseIdParam(rawId: string): number {
-  const id = Number(rawId);
-  if (!/^\d+$/.test(rawId) || !Number.isInteger(id) || id <= 0) {
-    throw AppError.validation('El id debe ser un entero positivo', [
-      { location: 'params', field: 'id', message: 'Debe ser un entero positivo' },
-    ]);
-  }
-  return id;
-}
 
 export function listTurnos(_req: Request, res: Response): void {
   res.status(200).json(turnoService.listTurnos());
 }
 
-export function getTurno(req: Request, res: Response): void {
-  const id = parseIdParam(req.params.id);
+export function getTurno(_req: Request, res: Response): void {
+  const { id } = validated<IdParam>(res, 'params');
   res.status(200).json(turnoService.getTurnoById(id));
 }
 
-export function createTurno(req: Request, res: Response): void {
-  const { datos, error } = validarBodyCreacion(req.body);
-  if (error || !datos) throw AppError.validation(error ?? 'Body invalido');
-
-  const normalized = normalizeTurnoFields(datos);
-  if (!normalized) throw AppError.validation(NORMALIZATION_ERROR);
-
-  res.status(201).json(turnoService.createTurno(normalized));
+export function createTurno(_req: Request, res: Response): void {
+  const body = validated<CreateTurnoBody>(res, 'body');
+  res.status(201).json(turnoService.createTurno(body));
 }
 
-export function updateTurno(req: Request, res: Response): void {
-  const id = parseIdParam(req.params.id);
-  const existing = turnoService.getTurnoById(id);
-
-  const { datos: changes, error } = validarBodyActualizacion(req.body);
-  if (error || !changes) throw AppError.validation(error ?? 'Body invalido');
-
-  const normalized = normalizeTurnoFields({ ...existing, ...changes });
-  if (!normalized) throw AppError.validation(NORMALIZATION_ERROR);
-
-  res.status(200).json(turnoService.updateTurno(id, normalized));
+export function updateTurno(_req: Request, res: Response): void {
+  const { id } = validated<IdParam>(res, 'params');
+  const body = validated<UpdateTurnoBody>(res, 'body');
+  res.status(200).json(turnoService.updateTurno(id, body));
 }
 
-export function deleteTurno(req: Request, res: Response): void {
-  const id = parseIdParam(req.params.id);
+export function deleteTurno(_req: Request, res: Response): void {
+  const { id } = validated<IdParam>(res, 'params');
   turnoService.deleteTurno(id);
   res.status(204).send();
 }

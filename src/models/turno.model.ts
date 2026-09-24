@@ -1,3 +1,5 @@
+import type { Especialidad } from './especialidad.js';
+
 /**
  * Forma cruda de un turno tal como llega desde el turnos.json de cada sede.
  * Los tipos son heterogeneos a proposito: cada centro medico exporta distinto.
@@ -12,9 +14,6 @@ export interface TurnoCrudo {
   confirmado: string | boolean;
   observaciones?: string;
 }
-
-/** Especialidades soportadas por la red de centros medicos. */
-export type Especialidad = 'Clinica medica' | 'Pediatria' | 'Odontologia' | 'Nutricion' | string;
 
 /**
  * Turno normalizado: la forma de dominio que usa el resto de la aplicacion

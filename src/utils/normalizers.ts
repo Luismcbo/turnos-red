@@ -1,3 +1,4 @@
+import { ESPECIALIDADES, type Especialidad } from '../models/especialidad.js';
 import type { TurnoCrudo, Turno, CreateTurnoInput } from '../models/turno.model.js';
 
 const DATE_DDMMYYYY = /^(\d{2})\/(\d{2})\/(\d{4})$/;
@@ -27,12 +28,30 @@ export function normalizePaciente(rawPaciente: string): string {
   return rawPaciente.trim().replace(/\s+/g, ' ');
 }
 
-/** Normaliza la especialidad a "Primera Letra Mayuscula" por palabra. */
-export function normalizeEspecialidad(rawEspecialidad: string): string {
-  return rawEspecialidad
-    .trim()
-    .toLowerCase()
-    .replace(/(^|\s)\p{L}/gu, (letter) => letter.toUpperCase());
+/** Clave de comparacion: sin tildes, en minusculas y con espacios colapsados. */
+function comparisonKey(value: string): string {
+  return value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
+}
+
+const ESPECIALIDAD_BY_KEY = new Map<string, Especialidad>(
+  ESPECIALIDADES.map((especialidad) => [comparisonKey(especialidad), especialidad]),
+);
+
+/**
+ * Traduce una especialidad escrita de forma libre ("PEDIATRÍA", "clinica medica") a su
+ * grafia canonica. Solo se usa donde se tolera variacion (archivos de las sedes y filtros
+ * por query params); el cuerpo de la API se valida de forma estricta con Zod.
+ */
+export function normalizeEspecialidad(rawEspecialidad: string): Especialidad | null {
+  return ESPECIALIDAD_BY_KEY.get(comparisonKey(rawEspecialidad)) ?? null;
+}
+
+/** Verifica que la combinacion anio/mes/dia exista en el calendario (rechaza 31/02). */
+function isRealDate(year: number, month: number, day: number): boolean {
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+  );
 }
 
 /** Acepta "DD/MM/YYYY" o "YYYY-MM-DD" y devuelve siempre "YYYY-MM-DD", o null si es invalida. */
@@ -42,11 +61,12 @@ export function normalizeFecha(rawFecha: string): string | null {
   const matchDDMMYYYY = DATE_DDMMYYYY.exec(fecha);
   if (matchDDMMYYYY) {
     const [, day, month, year] = matchDDMMYYYY;
-    return `${year}-${month}-${day}`;
+    return isRealDate(Number(year), Number(month), Number(day)) ? `${year}-${month}-${day}` : null;
   }
 
   if (DATE_ISO.test(fecha)) {
-    return fecha;
+    const [year, month, day] = fecha.split('-').map(Number);
+    return isRealDate(year, month, day) ? fecha : null;
   }
 
   return null;
@@ -104,7 +124,7 @@ export function normalizeTurnoFields(raw: Omit<TurnoCrudo, 'id'>): CreateTurnoIn
   if (documento.length === 0) return null;
 
   const especialidad = normalizeEspecialidad(raw.especialidad ?? '');
-  if (especialidad.length === 0) return null;
+  if (especialidad === null) return null;
 
   const data: CreateTurnoInput = { paciente, documento, especialidad, fecha, hora, confirmado };
 
