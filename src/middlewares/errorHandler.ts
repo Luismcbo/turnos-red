@@ -1,18 +1,41 @@
 import type { NextFunction, Request, Response } from 'express';
+import { AppError } from '../errors/AppError.js';
 
-export function rutaNoEncontrada(req: Request, res: Response): void {
-  res.status(404).json({ error: `Ruta no encontrada: ${req.method} ${req.originalUrl}` });
+/** Ruta inexistente: se convierte en un NOT_FOUND estandar. */
+export function notFoundHandler(req: Request, _res: Response, next: NextFunction): void {
+  next(AppError.notFound(`Ruta no encontrada: ${req.method} ${req.originalUrl}`));
 }
 
-// El cuarto parametro (_next) es requerido por Express para reconocer esto
-// como middleware de manejo de errores, aunque no se use.
-export function manejadorDeErrores(
+/** Convierte cualquier error conocido/desconocido en un AppError. */
+function toAppError(error: unknown): AppError {
+  if (error instanceof AppError) return error;
+
+  // body-parser (express.json) falla con SyntaxError cuando el JSON esta mal formado.
+  if (error instanceof SyntaxError && 'body' in error) return AppError.invalidJson();
+
+  return AppError.internal();
+}
+
+/**
+ * Middleware de manejo de errores centralizado. Debe registrarse AL FINAL de la
+ * cadena de middlewares. Toda falla de la API sale con el mismo formato:
+ * { status, message, code, details }.
+ */
+export function errorHandler(
   error: unknown,
   _req: Request,
   res: Response,
-  _next: NextFunction,
+  next: NextFunction,
 ): void {
-  const mensaje = error instanceof Error ? error.message : 'Error interno del servidor';
-  console.error('[error]', mensaje);
-  res.status(500).json({ error: 'Error interno del servidor' });
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  const appError = toAppError(error);
+  if (appError.status === 500) {
+    console.error('[error]', error);
+  }
+
+  res.status(appError.status).json(appError.toBody());
 }

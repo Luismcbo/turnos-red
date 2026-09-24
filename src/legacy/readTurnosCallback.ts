@@ -3,7 +3,7 @@
  *
  * Muestra la MISMA operacion de leer turnos.json pero con la API clasica
  * de callbacks de node:fs, para contrastar contra la version async/await
- * con node:fs/promises usada en src/services/turnosFileReader.ts.
+ * con node:fs/promises usada en src/services/fileReader.ts.
  *
  * Diferencias clave:
  * - Con callbacks el manejo de errores se hace por parametro (error-first
@@ -19,7 +19,7 @@ import { readFile } from 'node:fs';
 import { env } from '../config/env.js';
 import type { TurnoCrudo } from '../models/turno.model.js';
 
-function leerTurnosConCallback(
+function readTurnosWithCallback(
   rutaArchivo: string,
   callback: (error: Error | null, turnos?: TurnoCrudo[]) => void,
 ): void {
@@ -39,7 +39,7 @@ function leerTurnosConCallback(
   });
 }
 
-leerTurnosConCallback(env.turnosDataPath, (error, turnos) => {
+readTurnosWithCallback(env.turnosDataPath, (error, turnos) => {
   if (error) {
     console.error('[callback] Error al leer turnos:', error.message);
     return;

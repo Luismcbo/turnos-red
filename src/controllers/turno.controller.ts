@@ -1,121 +1,57 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
+import { AppError } from '../errors/AppError.js';
 import * as turnoService from '../services/turno.service.js';
-import { normalizarCamposTurno } from '../utils/normalizarTurno.js';
+import { normalizeTurnoFields } from '../utils/normalizers.js';
 import { validarBodyActualizacion, validarBodyCreacion } from '../utils/validarTurnoBody.js';
 
-function parseIdParam(idParam: string): number | null {
-  if (!/^\d+$/.test(idParam)) return null;
-  const id = Number(idParam);
-  return Number.isInteger(id) && id > 0 ? id : null;
+const NORMALIZATION_ERROR =
+  'No se pudo normalizar el turno: revisar formato de fecha (DD/MM/YYYY o YYYY-MM-DD), ' +
+  'hora (HH:mm o HH.mm) y confirmado (boolean o "si"/"no")';
+
+function parseIdParam(rawId: string): number {
+  const id = Number(rawId);
+  if (!/^\d+$/.test(rawId) || !Number.isInteger(id) || id <= 0) {
+    throw AppError.validation('El id debe ser un entero positivo', [
+      { location: 'params', field: 'id', message: 'Debe ser un entero positivo' },
+    ]);
+  }
+  return id;
 }
 
-export function listarTurnos(_req: Request, res: Response, next: NextFunction): void {
-  try {
-    const turnos = turnoService.listarTurnos();
-    res.status(200).json(turnos);
-  } catch (error) {
-    next(error);
-  }
+export function listTurnos(_req: Request, res: Response): void {
+  res.status(200).json(turnoService.listTurnos());
 }
 
-export function obtenerTurno(req: Request, res: Response, next: NextFunction): void {
-  try {
-    const id = parseIdParam(req.params.id);
-    if (id === null) {
-      res.status(400).json({ error: 'El id debe ser un entero positivo' });
-      return;
-    }
-
-    const turno = turnoService.buscarTurnoPorId(id);
-    if (!turno) {
-      res.status(404).json({ error: `No existe un turno con id ${id}` });
-      return;
-    }
-
-    res.status(200).json(turno);
-  } catch (error) {
-    next(error);
-  }
+export function getTurno(req: Request, res: Response): void {
+  const id = parseIdParam(req.params.id);
+  res.status(200).json(turnoService.getTurnoById(id));
 }
 
-export function crearTurno(req: Request, res: Response, next: NextFunction): void {
-  try {
-    const { datos: bodyValido, error: errorBody } = validarBodyCreacion(req.body);
-    if (errorBody || !bodyValido) {
-      res.status(400).json({ error: errorBody });
-      return;
-    }
+export function createTurno(req: Request, res: Response): void {
+  const { datos, error } = validarBodyCreacion(req.body);
+  if (error || !datos) throw AppError.validation(error ?? 'Body invalido');
 
-    const datosNormalizados = normalizarCamposTurno(bodyValido);
-    if (!datosNormalizados) {
-      res.status(400).json({
-        error:
-          'No se pudo normalizar el turno: revisar formato de fecha (DD/MM/YYYY o YYYY-MM-DD), ' +
-          'hora (HH:mm o HH.mm) y confirmado (boolean o "si"/"no")',
-      });
-      return;
-    }
+  const normalized = normalizeTurnoFields(datos);
+  if (!normalized) throw AppError.validation(NORMALIZATION_ERROR);
 
-    const turnoCreado = turnoService.crearTurno(datosNormalizados);
-    res.status(201).json(turnoCreado);
-  } catch (error) {
-    next(error);
-  }
+  res.status(201).json(turnoService.createTurno(normalized));
 }
 
-export function actualizarTurno(req: Request, res: Response, next: NextFunction): void {
-  try {
-    const id = parseIdParam(req.params.id);
-    if (id === null) {
-      res.status(400).json({ error: 'El id debe ser un entero positivo' });
-      return;
-    }
+export function updateTurno(req: Request, res: Response): void {
+  const id = parseIdParam(req.params.id);
+  const existing = turnoService.getTurnoById(id);
 
-    const turnoExistente = turnoService.buscarTurnoPorId(id);
-    if (!turnoExistente) {
-      res.status(404).json({ error: `No existe un turno con id ${id}` });
-      return;
-    }
+  const { datos: changes, error } = validarBodyActualizacion(req.body);
+  if (error || !changes) throw AppError.validation(error ?? 'Body invalido');
 
-    const { datos: cambios, error: errorBody } = validarBodyActualizacion(req.body);
-    if (errorBody || !cambios) {
-      res.status(400).json({ error: errorBody });
-      return;
-    }
+  const normalized = normalizeTurnoFields({ ...existing, ...changes });
+  if (!normalized) throw AppError.validation(NORMALIZATION_ERROR);
 
-    const datosNormalizados = normalizarCamposTurno({ ...turnoExistente, ...cambios });
-    if (!datosNormalizados) {
-      res.status(400).json({
-        error:
-          'No se pudo normalizar el turno: revisar formato de fecha (DD/MM/YYYY o YYYY-MM-DD), ' +
-          'hora (HH:mm o HH.mm) y confirmado (boolean o "si"/"no")',
-      });
-      return;
-    }
-
-    const turnoActualizado = turnoService.actualizarTurno(id, datosNormalizados);
-    res.status(200).json(turnoActualizado);
-  } catch (error) {
-    next(error);
-  }
+  res.status(200).json(turnoService.updateTurno(id, normalized));
 }
 
-export function eliminarTurno(req: Request, res: Response, next: NextFunction): void {
-  try {
-    const id = parseIdParam(req.params.id);
-    if (id === null) {
-      res.status(400).json({ error: 'El id debe ser un entero positivo' });
-      return;
-    }
-
-    const turnoEliminado = turnoService.eliminarTurno(id);
-    if (!turnoEliminado) {
-      res.status(404).json({ error: `No existe un turno con id ${id}` });
-      return;
-    }
-
-    res.status(200).json(turnoEliminado);
-  } catch (error) {
-    next(error);
-  }
+export function deleteTurno(req: Request, res: Response): void {
+  const id = parseIdParam(req.params.id);
+  turnoService.deleteTurno(id);
+  res.status(204).send();
 }

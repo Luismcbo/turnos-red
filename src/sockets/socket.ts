@@ -7,7 +7,7 @@ import { turnoEventBus } from '../events/turnoEventBus.js';
  * eventos interno (EventEmitter). Cada operacion exitosa sobre turnos se
  * retransmite en tiempo real a todos los clientes conectados, sin polling.
  */
-export function configurarSocket(httpServer: HttpServer): SocketIOServer {
+export function setupSocket(httpServer: HttpServer): SocketIOServer {
   const io = new SocketIOServer(httpServer, {
     cors: { origin: '*' },
   });

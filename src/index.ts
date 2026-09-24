@@ -1,15 +1,15 @@
 import { createServer } from 'node:http';
-import { crearApp } from './app.js';
+import { createApp } from './app.js';
 import { env } from './config/env.js';
-import { configurarSocket } from './sockets/socket.js';
-import { inicializarTurnos } from './services/turno.service.js';
+import { setupSocket } from './sockets/socket.js';
+import { initTurnos } from './services/turno.service.js';
 
 async function main(): Promise<void> {
-  await inicializarTurnos();
+  await initTurnos();
 
-  const app = crearApp();
+  const app = createApp();
   const httpServer = createServer(app);
-  configurarSocket(httpServer);
+  setupSocket(httpServer);
 
   httpServer.listen(env.port, () => {
     console.log(`[server] TurnosRed escuchando en http://localhost:${env.port}`);

@@ -33,8 +33,8 @@ export interface Turno {
   observaciones?: string;
 }
 
-/** Datos aceptados al crear un turno por la API (sin id, lo asigna el servicio). */
-export type NuevoTurnoInput = Omit<Turno, 'id'>;
+/** Datos aceptados al crear un turno (sin id, lo asigna el servicio). */
+export type CreateTurnoInput = Omit<Turno, 'id'>;
 
-/** Datos aceptados al actualizar un turno por la API (todos los campos opcionales salvo el id). */
-export type ActualizarTurnoInput = Partial<Omit<Turno, 'id'>>;
+/** Datos aceptados al actualizar un turno (todos los campos opcionales). */
+export type UpdateTurnoInput = Partial<Omit<Turno, 'id'>>;
