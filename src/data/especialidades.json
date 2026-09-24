@@ -1,0 +1,6 @@
+[
+  { "id": 1, "nombre": "Clínica médica", "descripcion": "Atención general de adultos" },
+  { "id": 2, "nombre": "Pediatría", "descripcion": "Atención de niños y adolescentes" },
+  { "id": 3, "nombre": "Odontología", "descripcion": "Salud bucal y dental" },
+  { "id": 4, "nombre": "Nutrición", "descripcion": "Alimentación y hábitos saludables" }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "nombre": "Laura",
+    "apellido": "Benítez",
+    "matricula": "PR-1001",
+    "especialidadId": 2,
+    "email": "laura.benitez@turnosred.test",
+    "activo": true
+  },
+  {
+    "id": 2,
+    "nombre": "Martín",
+    "apellido": "Suárez",
+    "matricula": "PR-1002",
+    "especialidadId": 3,
+    "email": "martin.suarez@turnosred.test",
+    "activo": true
+  },
+  {
+    "id": 3,
+    "nombre": "Sofía",
+    "apellido": "Ledesma",
+    "matricula": "PR-1003",
+    "especialidadId": 4,
+    "activo": false
+  },
+  {
+    "id": 4,
+    "nombre": "Ricardo",
+    "apellido": "Paz",
+    "matricula": "PR-1004",
+    "especialidadId": 1,
+    "activo": true
+  },
+  {
+    "id": 5,
+    "nombre": "Ana",
+    "apellido": "Rossi",
+    "matricula": "PR-1005",
+    "especialidadId": 2,
+    "email": "ana.rossi@turnosred.test",
+    "activo": true
+  }
+]

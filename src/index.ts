@@ -15,7 +15,9 @@ async function main(): Promise<void> {
 
   httpServer.listen(env.port, () => {
     console.log(`[server] TurnosRed escuchando en http://localhost:${env.port}`);
-    console.log(`[server] Cliente de prueba Socket.IO en http://localhost:${env.port}/`);
+    console.log(
+      `[server] Cliente de prueba Socket.IO en http://localhost:${env.port}/socket-client/`,
+    );
   });
 }
 
