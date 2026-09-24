@@ -5,7 +5,11 @@ import {
   normalizeHora,
   normalizePaciente,
 } from '../utils/normalizers.js';
-import { especialidadSchema } from './common.schema.js';
+import {
+  especialidadFilterSchema,
+  especialidadSchema,
+  positiveIntFromString,
+} from './common.schema.js';
 
 const pacienteSchema = z
   .string()
@@ -80,3 +84,16 @@ export const updateTurnoSchema = z
 
 export type CreateTurnoBody = z.output<typeof createTurnoSchema>;
 export type UpdateTurnoBody = z.output<typeof updateTurnoSchema>;
+
+/**
+ * Query params de GET /turnos (todos opcionales, se combinan con AND):
+ *   ?especialidad=Pediatria&fecha=14/08/2026&medicoId=1
+ * La fecha acepta DD/MM/YYYY o YYYY-MM-DD.
+ */
+export const turnoQuerySchema = z.object({
+  especialidad: especialidadFilterSchema.optional(),
+  fecha: fechaSchema.optional(),
+  medicoId: positiveIntFromString.optional(),
+});
+
+export type TurnoQuery = z.output<typeof turnoQuerySchema>;

@@ -1,7 +1,12 @@
 import { env } from '../config/env.js';
 import { AppError } from '../errors/AppError.js';
 import { eventBus } from '../events/eventBus.js';
-import type { CreateMedicoInput, Medico, UpdateMedicoInput } from '../models/medico.model.js';
+import type {
+  CreateMedicoInput,
+  Medico,
+  MedicoFilters,
+  UpdateMedicoInput,
+} from '../models/medico.model.js';
 import { medicoRecordSchema } from '../schemas/medico.schema.js';
 import { readJsonArray } from './fileReader.js';
 
@@ -32,8 +37,15 @@ function notFound(id: number): AppError {
   return AppError.notFound(`No existe un medico con id ${id}`);
 }
 
-export function listMedicos(): Medico[] {
-  return medicos;
+/** Lista medicos aplicando (con AND) los filtros que vengan definidos. */
+export function listMedicos(filters: MedicoFilters = {}): Medico[] {
+  const { especialidad, disponible } = filters;
+
+  return medicos.filter(
+    (medico) =>
+      (especialidad === undefined || medico.especialidad === especialidad) &&
+      (disponible === undefined || medico.disponible === disponible),
+  );
 }
 
 export function medicoExists(id: number): boolean {

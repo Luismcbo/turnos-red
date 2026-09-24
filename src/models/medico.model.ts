@@ -16,3 +16,9 @@ export type CreateMedicoInput = Omit<Medico, 'id'>;
 
 /** Datos aceptados al actualizar un medico (todos los campos opcionales). */
 export type UpdateMedicoInput = Partial<Omit<Medico, 'id'>>;
+
+/** Filtros de listado de medicos (ya normalizados). */
+export interface MedicoFilters {
+  especialidad?: Especialidad;
+  disponible?: boolean;
+}

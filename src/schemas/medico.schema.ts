@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { especialidadSchema } from './common.schema.js';
+import { especialidadFilterSchema, especialidadSchema } from './common.schema.js';
 
 const nameSchema = z.string().trim().min(1, 'No puede estar vacío').max(60);
 
@@ -35,3 +35,17 @@ export const medicoRecordSchema = z.strictObject({
 
 export type CreateMedicoBody = z.output<typeof createMedicoSchema>;
 export type UpdateMedicoBody = z.output<typeof updateMedicoSchema>;
+
+/**
+ * Query params de GET /medicos (opcionales, se combinan con AND):
+ *   ?especialidad=Odontologia&disponible=true
+ */
+export const medicoQuerySchema = z.object({
+  especialidad: especialidadFilterSchema.optional(),
+  disponible: z
+    .enum(['true', 'false'], { error: 'Debe ser "true" o "false"' })
+    .transform((value) => value === 'true')
+    .optional(),
+});
+
+export type MedicoQuery = z.output<typeof medicoQuerySchema>;

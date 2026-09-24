@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express';
 import { validated } from '../middlewares/validate.js';
 import type { IdParam } from '../schemas/common.schema.js';
-import type { CreateTurnoBody, UpdateTurnoBody } from '../schemas/turno.schema.js';
+import type { CreateTurnoBody, TurnoQuery, UpdateTurnoBody } from '../schemas/turno.schema.js';
 import * as turnoService from '../services/turno.service.js';
 
 export function listTurnos(_req: Request, res: Response): void {
-  res.status(200).json(turnoService.listTurnos());
+  const filters = validated<TurnoQuery>(res, 'query');
+  res.status(200).json(turnoService.listTurnos(filters));
 }
 
 export function getTurno(_req: Request, res: Response): void {

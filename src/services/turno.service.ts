@@ -4,6 +4,7 @@ import { eventBus } from '../events/eventBus.js';
 import type {
   CreateTurnoInput,
   Turno,
+  TurnoFilters,
   TurnoCrudo,
   UpdateTurnoInput,
 } from '../models/turno.model.js';
@@ -47,8 +48,16 @@ function assertMedicoExists(medicoId: number | null | undefined): void {
   ]);
 }
 
-export function listTurnos(): Turno[] {
-  return turnos;
+/** Lista turnos aplicando (con AND) los filtros que vengan definidos. */
+export function listTurnos(filters: TurnoFilters = {}): Turno[] {
+  const { especialidad, fecha, medicoId } = filters;
+
+  return turnos.filter(
+    (turno) =>
+      (especialidad === undefined || turno.especialidad === especialidad) &&
+      (fecha === undefined || turno.fecha === fecha) &&
+      (medicoId === undefined || turno.medicoId === medicoId),
+  );
 }
 
 export function getTurnoById(id: number): Turno {

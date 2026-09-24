@@ -42,3 +42,10 @@ export type CreateTurnoInput = Omit<Turno, 'id'>;
 export type UpdateTurnoInput = Partial<Omit<Turno, 'id' | 'medicoId'>> & {
   medicoId?: number | null;
 };
+
+/** Filtros de listado de turnos (ya normalizados: especialidad canonica, fecha ISO). */
+export interface TurnoFilters {
+  especialidad?: Especialidad;
+  fecha?: string;
+  medicoId?: number;
+}

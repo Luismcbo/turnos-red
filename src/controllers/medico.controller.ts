@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express';
 import { validated } from '../middlewares/validate.js';
 import type { IdParam } from '../schemas/common.schema.js';
-import type { CreateMedicoBody, UpdateMedicoBody } from '../schemas/medico.schema.js';
+import type { CreateMedicoBody, MedicoQuery, UpdateMedicoBody } from '../schemas/medico.schema.js';
 import * as medicoService from '../services/medico.service.js';
 
 export function listMedicos(_req: Request, res: Response): void {
-  res.status(200).json(medicoService.listMedicos());
+  const filters = validated<MedicoQuery>(res, 'query');
+  res.status(200).json(medicoService.listMedicos(filters));
 }
 
 export function getMedico(_req: Request, res: Response): void {
