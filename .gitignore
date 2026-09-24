@@ -3,9 +3,13 @@ node_modules/
 
 # Build
 dist/
+*.tsbuildinfo
 
-# Variables de entorno
+# Variables de entorno: contienen configuracion local/secretos y NUNCA se versionan.
+# Solo se versiona la plantilla .env.example
 .env
+.env.*
+!.env.example
 
 # Logs
 npm-debug.log*
