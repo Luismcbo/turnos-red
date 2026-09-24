@@ -1,11 +1,72 @@
 {
   "info": {
-    "_postman_id": "97172a6b-f3ac-4cc5-a0ac-e221b60d2b03",
+    "_postman_id": "483482d0-4283-414b-8c3f-b8b9aa8cb9c2",
     "name": "TurnosRed API",
-    "description": "Coleccion de la Actividad 2 de TurnosRed (Turnos + Médicos).\n\n- Importar junto con `turnos-red.postman_environment.json` y seleccionar el environment \"TurnosRed - Local\".\n- Ejecutar con el Collection Runner en orden: la carpeta 1 crea un médico (guarda `medicoId`), la 2 crea un turno vinculado (guarda `turnoId`) y la 3 limpia.\n- Cada request incluye tests (status code + esquema JSON) y un ejemplo guardado (Saved Response) listo para usarse como Mock Server.\n- Formato de error de toda la API: `{ \"status\", \"message\", \"code\", \"details\": [] }`.",
+    "description": "Coleccion de la Actividad 2 de TurnosRed (Turnos + Médicos).\n\n- Importar junto con `turnos-red.postman_environment.json` y seleccionar el environment \"TurnosRed - Local\".\n- Ejecutar con el Collection Runner en orden: la carpeta 1 crea un médico (guarda `medicoId`), la 2 crea un turno vinculado (guarda `turnoId`), la 3 limpia, la 4 y 5 cubren Especialidades y Profesionales (guardan `especialidadId` y `profesionalId`) y la 6 limpia.\n- Cada request incluye tests (status code + esquema JSON) y un ejemplo guardado (Saved Response) listo para usarse como Mock Server.\n- Formato de error de toda la API: `{ \"status\", \"message\", \"code\", \"details\": [] }`.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "0. General",
+      "description": "Endpoint de bienvenida (controller general).",
+      "item": [
+        {
+          "name": "GET / - Hello World (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Devuelve el mensaje de bienvenida', function () { pm.expect(pm.response.json().message).to.include('Hello World'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": []
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/",
+                  "host": ["http://localhost:3000"],
+                  "path": []
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Hello World - API de TurnosRed\"\n}"
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "1. Médicos",
       "description": "CRUD del recurso Médico: happy path, filtros y casos de error (400/404).",
@@ -2534,6 +2595,3182 @@
           ]
         }
       ]
+    },
+    {
+      "name": "4. Especialidades",
+      "description": "CRUD de Especialidades (especialidades.controller): happy path y unhappy path (400/404).",
+      "item": [
+        {
+          "name": "GET /especialidades - Listar especialidades (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ESPECIALIDAD_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"descripcion\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Es un arreglo no vacío con el esquema de Especialidad', function () {",
+                  "    pm.response.to.have.jsonSchema({ type: 'array', minItems: 4, items: ESPECIALIDAD_SCHEMA });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 1,\n    \"nombre\": \"Clínica médica\",\n    \"descripcion\": \"Atención general de adultos\"\n  },\n  {\n    \"id\": 2,\n    \"nombre\": \"Pediatría\",\n    \"descripcion\": \"Atención de niños y adolescentes\"\n  },\n  {\n    \"id\": 3,\n    \"nombre\": \"Odontología\",\n    \"descripcion\": \"Salud bucal y dental\"\n  },\n  {\n    \"id\": 4,\n    \"nombre\": \"Nutrición\",\n    \"descripcion\": \"Alimentación y hábitos saludables\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /especialidades?nombre=pedia - Filtrar por nombre (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Todos los nombres contienen el texto buscado', function () {",
+                  "    const list = pm.response.json();",
+                  "    pm.expect(list).to.be.an(\"array\").that.is.not.empty;",
+                  "    list.forEach(function (e) { pm.expect(e.nombre.toLowerCase()).to.include('pedia'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades?nombre=pedia",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"],
+              "query": [
+                {
+                  "key": "nombre",
+                  "value": "pedia",
+                  "description": "Contiene el texto; ignora mayúsculas y tildes"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades?nombre=pedia",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"],
+                  "query": [
+                    {
+                      "key": "nombre",
+                      "value": "pedia"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 2,\n    \"nombre\": \"Pediatría\",\n    \"descripcion\": \"Atención de niños y adolescentes\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "POST /especialidades - Crear especialidad (201)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.collectionVariables.set('uniq', Date.now().toString().slice(-6));"]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ESPECIALIDAD_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"descripcion\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "// Guarda la variable en el environment (pedido de la consigna) y tambien como variable de",
+                  "// coleccion, asi los tests siguen en verde aunque no haya un environment seleccionado.",
+                  "function saveVar(name, value) {",
+                  "    pm.environment.set(name, value);",
+                  "    pm.collectionVariables.set(name, value);",
+                  "}",
+                  "",
+                  "pm.test('Status code es 201 (Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Especialidad', function () {",
+                  "    pm.response.to.have.jsonSchema(ESPECIALIDAD_SCHEMA);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Refleja los datos enviados', function () {",
+                  "    pm.expect(body.nombre).to.eql('Cardiología ' + pm.variables.get('uniq'));",
+                  "    pm.expect(body.descripcion).to.eql('Salud cardiovascular');",
+                  "});",
+                  "saveVar('especialidadId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cardiología {{uniq}}\",\n  \"descripcion\": \"Salud cardiovascular\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Cardiología 502838\",\n  \"descripcion\": \"Salud cardiovascular\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 5,\n  \"nombre\": \"Cardiología 502838\",\n  \"descripcion\": \"Salud cardiovascular\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /especialidades/:id - Obtener especialidad (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ESPECIALIDAD_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"descripcion\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Especialidad', function () {",
+                  "    pm.response.to.have.jsonSchema(ESPECIALIDAD_SCHEMA);",
+                  "});",
+                  "pm.test('El id coincide con el solicitado', function () {",
+                  "    pm.expect(pm.response.json().id).to.eql(Number(pm.variables.get('especialidadId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "{{especialidadId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/5",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "5"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 5,\n  \"nombre\": \"Cardiología 502838\",\n  \"descripcion\": \"Salud cardiovascular\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /especialidades/:id - Actualizar especialidad (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ESPECIALIDAD_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"descripcion\":{\"type\":\"string\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Especialidad', function () {",
+                  "    pm.response.to.have.jsonSchema(ESPECIALIDAD_SCHEMA);",
+                  "});",
+                  "pm.test('Aplica solo los cambios enviados', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.descripcion).to.eql('Cuidado del corazón');",
+                  "    pm.expect(body.nombre).to.include('Cardiología');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Cuidado del corazón\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "{{especialidadId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"descripcion\": \"Cuidado del corazón\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/5",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "5"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 5,\n  \"nombre\": \"Cardiología 502838\",\n  \"descripcion\": \"Cuidado del corazón\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /especialidades - Body incompleto (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: nombre', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"nombre\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los datos de la especialidad no son válidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"nombre\",\n      \"message\": \"El campo es obligatorio\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /especialidades - Tipos de datos inválidos y campo desconocido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: nombre, descripcion, extra', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"nombre\",\"descripcion\",\"extra\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": 123,\n  \"descripcion\": true,\n  \"extra\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": 123,\n  \"descripcion\": true,\n  \"extra\": \"x\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los datos de la especialidad no son válidos (3 errores)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"extra\",\n      \"message\": \"Campo no permitido\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"nombre\",\n      \"message\": \"Debe ser un texto (string)\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"descripcion\",\n      \"message\": \"Debe ser un texto (string)\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /especialidades - Nombre duplicado (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: nombre', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"nombre\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Pediatria\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Pediatria\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Ya existe una especialidad con ese nombre\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"nombre\",\n      \"message\": \"Ya existe una especialidad llamada \\\"Pediatria\\\"\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /especialidades - JSON mal formado (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=INVALID_JSON en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('INVALID_JSON');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"nombre\": ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"nombre\": ",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"El cuerpo de la peticion no es un JSON valido\",\n  \"code\": \"INVALID_JSON\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /especialidades?nombre= - Filtro vacío (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: nombre', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"nombre\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('query'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades?nombre=",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades"],
+              "query": [
+                {
+                  "key": "nombre",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades?nombre=",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades"],
+                  "query": [
+                    {
+                      "key": "nombre",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los filtros enviados no son válidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"query\",\n      \"field\": \"nombre\",\n      \"message\": \"No puede estar vacío\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /especialidades/abc - Id no numérico (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: id', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"id\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('params'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "abc"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/abc",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "abc"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"El id de la especialidad debe ser un entero positivo\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"params\",\n      \"field\": \"id\",\n      \"message\": \"Debe ser un entero positivo\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /especialidades/:id - Especialidad inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe la especialidad', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe una especialidad con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /especialidades/:id - Especialidad inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe la especialidad', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otra\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Otra\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe una especialidad con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /especialidades/:id - Body vacío (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: (root)', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"(root)\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "{{especialidadId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/5",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "5"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los datos de la especialidad no son válidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"(root)\",\n      \"message\": \"Debe enviar al menos un campo para actualizar\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /especialidades/:id - Especialidad inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe la especialidad', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe una especialidad con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Profesionales",
+      "description": "CRUD de Profesionales vinculados a la especialidad creada (profesionales.controller): happy path y unhappy path.",
+      "item": [
+        {
+          "name": "POST /profesionales - Crear profesional (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const PROFESIONAL_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidadId\",\"activo\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidadId\":{\"type\":\"integer\",\"minimum\":1},\"email\":{\"type\":\"string\"},\"activo\":{\"type\":\"boolean\"}},\"additionalProperties\":false};",
+                  "// Guarda la variable en el environment (pedido de la consigna) y tambien como variable de",
+                  "// coleccion, asi los tests siguen en verde aunque no haya un environment seleccionado.",
+                  "function saveVar(name, value) {",
+                  "    pm.environment.set(name, value);",
+                  "    pm.collectionVariables.set(name, value);",
+                  "}",
+                  "",
+                  "pm.test('Status code es 201 (Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Profesional', function () {",
+                  "    pm.response.to.have.jsonSchema(PROFESIONAL_SCHEMA);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('Queda activo por defecto y vinculado a la especialidad', function () {",
+                  "    pm.expect(body.activo).to.eql(true);",
+                  "    pm.expect(body.especialidadId).to.eql(Number(pm.variables.get('especialidadId')));",
+                  "});",
+                  "saveVar('profesionalId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"PR-{{uniq}}\",\n  \"especialidadId\": {{especialidadId}},\n  \"email\": \"julia.{{uniq}}@turnosred.test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"PR-502838\",\n  \"especialidadId\": 5,\n  \"email\": \"julia.502838@turnosred.test\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 6,\n  \"activo\": true,\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"PR-502838\",\n  \"especialidadId\": 5,\n  \"email\": \"julia.502838@turnosred.test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /profesionales - Listar profesionales (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const PROFESIONAL_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidadId\",\"activo\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidadId\":{\"type\":\"integer\",\"minimum\":1},\"email\":{\"type\":\"string\"},\"activo\":{\"type\":\"boolean\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Es un arreglo no vacío con el esquema de Profesional', function () {",
+                  "    pm.response.to.have.jsonSchema({ type: 'array', minItems: 1, items: PROFESIONAL_SCHEMA });",
+                  "});",
+                  "pm.test('Incluye el profesional creado en este flujo', function () {",
+                  "    pm.expect(pm.response.json().map(function (p) { return p.id; })).to.include(Number(pm.variables.get('profesionalId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 1,\n    \"nombre\": \"Laura\",\n    \"apellido\": \"Benítez\",\n    \"matricula\": \"PR-1001\",\n    \"especialidadId\": 2,\n    \"email\": \"laura.benitez@turnosred.test\",\n    \"activo\": true\n  },\n  {\n    \"id\": 2,\n    \"nombre\": \"Martín\",\n    \"apellido\": \"Suárez\",\n    \"matricula\": \"PR-1002\",\n    \"especialidadId\": 3,\n    \"email\": \"martin.suarez@turnosred.test\",\n    \"activo\": true\n  },\n  {\n    \"id\": 3,\n    \"nombre\": \"Sofía\",\n    \"apellido\": \"Ledesma\",\n    \"matricula\": \"PR-1003\",\n    \"especialidadId\": 4,\n    \"activo\": false\n  },\n  {\n    \"id\": 4,\n    \"nombre\": \"Ricardo\",\n    \"apellido\": \"Paz\",\n    \"matricula\": \"PR-1004\",\n    \"especialidadId\": 1,\n    \"activo\": true\n  },\n  {\n    \"id\": 5,\n    \"nombre\": \"Ana\",\n    \"apellido\": \"Rossi\",\n    \"matricula\": \"PR-1005\",\n    \"especialidadId\": 2,\n    \"email\": \"ana.rossi@turnosred.test\",\n    \"activo\": true\n  },\n  {\n    \"id\": 6,\n    \"activo\": true,\n    \"nombre\": \"Julia\",\n    \"apellido\": \"Fernández\",\n    \"matricula\": \"PR-502838\",\n    \"especialidadId\": 5,\n    \"email\": \"julia.502838@turnosred.test\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /profesionales?especialidadId&activo&apellido - Filtrar (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('Devuelve solo al profesional creado (cumple los tres filtros)', function () {",
+                  "    const list = pm.response.json();",
+                  "    pm.expect(list).to.have.lengthOf(1);",
+                  "    pm.expect(list[0].id).to.eql(Number(pm.variables.get('profesionalId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales?especialidadId={{especialidadId}}&activo=true&apellido=fernand",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"],
+              "query": [
+                {
+                  "key": "especialidadId",
+                  "value": "{{especialidadId}}",
+                  "description": "Id de la especialidad"
+                },
+                {
+                  "key": "activo",
+                  "value": "true",
+                  "description": "\"true\" o \"false\""
+                },
+                {
+                  "key": "apellido",
+                  "value": "fernand",
+                  "description": "Contiene el texto; ignora mayúsculas y tildes"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales?especialidadId=5&activo=true&apellido=fernand",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"],
+                  "query": [
+                    {
+                      "key": "especialidadId",
+                      "value": "5"
+                    },
+                    {
+                      "key": "activo",
+                      "value": "true"
+                    },
+                    {
+                      "key": "apellido",
+                      "value": "fernand"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 6,\n    \"activo\": true,\n    \"nombre\": \"Julia\",\n    \"apellido\": \"Fernández\",\n    \"matricula\": \"PR-502838\",\n    \"especialidadId\": 5,\n    \"email\": \"julia.502838@turnosred.test\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /profesionales/:id - Obtener profesional (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const PROFESIONAL_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidadId\",\"activo\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidadId\":{\"type\":\"integer\",\"minimum\":1},\"email\":{\"type\":\"string\"},\"activo\":{\"type\":\"boolean\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Profesional', function () {",
+                  "    pm.response.to.have.jsonSchema(PROFESIONAL_SCHEMA);",
+                  "});",
+                  "pm.test('El id coincide con el solicitado', function () {",
+                  "    pm.expect(pm.response.json().id).to.eql(Number(pm.variables.get('profesionalId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/{{profesionalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "{{profesionalId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "6"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 6,\n  \"activo\": true,\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"PR-502838\",\n  \"especialidadId\": 5,\n  \"email\": \"julia.502838@turnosred.test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /profesionales/:id - Actualizar profesional (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const PROFESIONAL_SCHEMA = {\"type\":\"object\",\"required\":[\"id\",\"nombre\",\"apellido\",\"matricula\",\"especialidadId\",\"activo\"],\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1},\"nombre\":{\"type\":\"string\",\"minLength\":1},\"apellido\":{\"type\":\"string\",\"minLength\":1},\"matricula\":{\"type\":\"string\",\"minLength\":1},\"especialidadId\":{\"type\":\"integer\",\"minimum\":1},\"email\":{\"type\":\"string\"},\"activo\":{\"type\":\"boolean\"}},\"additionalProperties\":false};",
+                  "",
+                  "pm.test('Status code es 200 (OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de Profesional', function () {",
+                  "    pm.response.to.have.jsonSchema(PROFESIONAL_SCHEMA);",
+                  "});",
+                  "pm.test('Aplica el cambio y conserva el resto', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.activo).to.eql(false);",
+                  "    pm.expect(body.apellido).to.eql('Fernández');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/{{profesionalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "{{profesionalId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"activo\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "6"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 6,\n  \"activo\": false,\n  \"nombre\": \"Julia\",\n  \"apellido\": \"Fernández\",\n  \"matricula\": \"PR-502838\",\n  \"especialidadId\": 5,\n  \"email\": \"julia.502838@turnosred.test\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /profesionales - Body incompleto (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: nombre, apellido, matricula, especialidadId', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"nombre\",\"apellido\",\"matricula\",\"especialidadId\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los datos del profesional no son válidos (4 errores)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"nombre\",\n      \"message\": \"El campo es obligatorio\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"apellido\",\n      \"message\": \"El campo es obligatorio\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"matricula\",\n      \"message\": \"El campo es obligatorio\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidadId\",\n      \"message\": \"El campo es obligatorio\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /profesionales - Tipos de datos inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: nombre, apellido, matricula, especialidadId, email, activo', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"nombre\",\"apellido\",\"matricula\",\"especialidadId\",\"email\",\"activo\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": 1,\n  \"apellido\": \"\",\n  \"matricula\": null,\n  \"especialidadId\": \"abc\",\n  \"email\": \"no-es-un-mail\",\n  \"activo\": \"si\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": 1,\n  \"apellido\": \"\",\n  \"matricula\": null,\n  \"especialidadId\": \"abc\",\n  \"email\": \"no-es-un-mail\",\n  \"activo\": \"si\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los datos del profesional no son válidos (6 errores)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"nombre\",\n      \"message\": \"Debe ser un texto (string)\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"apellido\",\n      \"message\": \"No puede estar vacío\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"matricula\",\n      \"message\": \"Debe ser un texto (string)\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"email\",\n      \"message\": \"Debe tener formato de correo electrónico\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidadId\",\n      \"message\": \"Debe ser un número entero positivo\"\n    },\n    {\n      \"location\": \"body\",\n      \"field\": \"activo\",\n      \"message\": \"Debe ser booleano (true o false)\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /profesionales - Especialidad inexistente (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: especialidadId', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"especialidadId\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Rossi\",\n  \"matricula\": \"PR-NO-EXISTE\",\n  \"especialidadId\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Rossi\",\n  \"matricula\": \"PR-NO-EXISTE\",\n  \"especialidadId\": 999999\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La especialidad indicada no existe\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidadId\",\n      \"message\": \"No existe una especialidad con id 999999\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /profesionales - Matrícula duplicada (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: matricula', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"matricula\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Rossi\",\n  \"matricula\": \"PR-1001\",\n  \"especialidadId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Rossi\",\n  \"matricula\": \"PR-1001\",\n  \"especialidadId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Ya existe un profesional con esa matrícula\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"matricula\",\n      \"message\": \"La matrícula \\\"PR-1001\\\" ya está registrada\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /profesionales/:id - Especialidad inexistente (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: especialidadId', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"especialidadId\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"especialidadId\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/{{profesionalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "{{profesionalId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"especialidadId\": 999999\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "6"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"La especialidad indicada no existe\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"especialidadId\",\n      \"message\": \"No existe una especialidad con id 999999\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /profesionales/:id - activo con tipo inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: activo', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"activo\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('body'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": \"no\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/{{profesionalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "{{profesionalId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"activo\": \"no\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "6"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los datos del profesional no son válidos (1 error)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"body\",\n      \"field\": \"activo\",\n      \"message\": \"Debe ser booleano (true o false)\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /profesionales - Filtros inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: especialidadId, activo', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"especialidadId\",\"activo\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('query'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales?especialidadId=abc&activo=quizas",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales"],
+              "query": [
+                {
+                  "key": "especialidadId",
+                  "value": "abc"
+                },
+                {
+                  "key": "activo",
+                  "value": "quizas"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales?especialidadId=abc&activo=quizas",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales"],
+                  "query": [
+                    {
+                      "key": "especialidadId",
+                      "value": "abc"
+                    },
+                    {
+                      "key": "activo",
+                      "value": "quizas"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"Los filtros enviados no son válidos (2 errores)\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"query\",\n      \"field\": \"especialidadId\",\n      \"message\": \"Debe ser un entero positivo\"\n    },\n    {\n      \"location\": \"query\",\n      \"field\": \"activo\",\n      \"message\": \"Debe ser \\\"true\\\" o \\\"false\\\"\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /profesionales/abc - Id no numérico (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('details cubre los campos: id', function () {",
+                  "    const fields = err.details.map(function (x) { return x.field; });",
+                  "    [\"id\"].forEach(function (f) { pm.expect(fields, 'falta el detalle de ' + f).to.include(f); });",
+                  "    err.details.forEach(function (x) { pm.expect(x.location).to.eql('params'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "abc"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/abc",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "abc"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"El id del profesional debe ser un entero positivo\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"params\",\n      \"field\": \"id\",\n      \"message\": \"Debe ser un entero positivo\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /profesionales/:id - Profesional inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe el profesional', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un profesional con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT /profesionales/:id - Profesional inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe el profesional', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"activo\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un profesional con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /profesionales/:id - Profesional inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe el profesional', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "999999"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/999999",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "999999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un profesional con id 999999\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Limpieza de Especialidades y Profesionales",
+      "description": "Regla de negocio (no se borra una especialidad con profesionales), borrados 204 y 404 posteriores.",
+      "item": [
+        {
+          "name": "DELETE /especialidades/:id - Con profesionales asociados (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 400 (Bad Request)', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=400 y code=VALIDATION_ERROR en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(400);",
+                  "    pm.expect(err.code).to.eql('VALIDATION_ERROR');",
+                  "});",
+                  "pm.test('Explica que tiene profesionales asociados', function () { pm.expect(err.message).to.include('profesionales asociados'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "{{especialidadId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/5",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "5"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 400,\n  \"message\": \"No se puede eliminar una especialidad con profesionales asociados\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"details\": [\n    {\n      \"location\": \"params\",\n      \"field\": \"id\",\n      \"message\": \"Tiene 1 profesional(es) asociado(s)\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /profesionales/:id - Eliminar profesional (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 204 (No Content)', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('204 no devuelve cuerpo', function () { pm.expect(pm.response.text()).to.be.empty; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/{{profesionalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "{{profesionalId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "6"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "GET /profesionales/:id - Profesional ya eliminado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe el profesional', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/{{profesionalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "{{profesionalId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "6"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un profesional con id 6\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /profesionales/:id - Eliminar dos veces (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe el profesional', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profesionales/{{profesionalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["profesionales", "{{profesionalId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/profesionales/6",
+                  "host": ["http://localhost:3000"],
+                  "path": ["profesionales", "6"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe un profesional con id 6\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /especialidades/:id - Eliminar especialidad (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 204 (No Content)', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "pm.test('204 no devuelve cuerpo', function () { pm.expect(pm.response.text()).to.be.empty; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "{{especialidadId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/5",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "5"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "GET /especialidades/:id - Especialidad ya eliminada (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe la especialidad', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "{{especialidadId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/5",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "5"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe una especialidad con id 5\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE /especialidades/:id - Eliminar dos veces (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje indica que no existe la especialidad', function () { pm.expect(err.message).to.include('No existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["especialidades", "{{especialidadId}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/especialidades/5",
+                  "host": ["http://localhost:3000"],
+                  "path": ["especialidades", "5"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"No existe una especialidad con id 5\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /ruta-que-no-existe - Ruta inexistente con otro verbo (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ERROR_SCHEMA = {\"type\":\"object\",\"required\":[\"status\",\"message\",\"code\",\"details\"],\"properties\":{\"status\":{\"type\":\"integer\"},\"message\":{\"type\":\"string\",\"minLength\":1},\"code\":{\"type\":\"string\",\"enum\":[\"VALIDATION_ERROR\",\"INVALID_JSON\",\"NOT_FOUND\",\"INTERNAL_ERROR\"]},\"details\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"field\",\"message\"],\"properties\":{\"location\":{\"type\":\"string\",\"enum\":[\"body\",\"query\",\"params\"]},\"field\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}};",
+                  "",
+                  "pm.test('Status code es 404 (Not Found)', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Content-Type es application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test('El cuerpo cumple el esquema JSON de error estandar { status, message, code, details }', function () {",
+                  "    pm.response.to.have.jsonSchema(ERROR_SCHEMA);",
+                  "});",
+                  "const err = pm.response.json();",
+                  "pm.test('status=404 y code=NOT_FOUND en el cuerpo', function () {",
+                  "    pm.expect(err.status).to.eql(404);",
+                  "    pm.expect(err.code).to.eql('NOT_FOUND');",
+                  "});",
+                  "pm.test('El mensaje incluye verbo y ruta', function () { pm.expect(err.message).to.include('POST').and.include('/ruta-que-no-existe'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ruta-que-no-existe",
+              "host": ["{{baseUrl}}"],
+              "path": ["ruta-que-no-existe"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/ruta-que-no-existe",
+                  "host": ["http://localhost:3000"],
+                  "path": ["ruta-que-no-existe"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": 404,\n  \"message\": \"Ruta no encontrada: POST /ruta-que-no-existe\",\n  \"code\": \"NOT_FOUND\",\n  \"details\": []\n}"
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
@@ -2549,6 +5786,21 @@
     },
     {
       "key": "turnoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "especialidadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "profesionalId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "uniq",
       "value": "",
       "type": "string"
     }
