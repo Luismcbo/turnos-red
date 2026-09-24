@@ -1,5 +1,6 @@
 import especialidadesData from '../data/especialidades.json' with { type: 'json' };
 import type { EspecialidadItem } from '../models/especialidades.model.js';
+import { comparisonKey } from '../utils/normalizers.js';
 
 // Datos en memoria cargados desde src/data/especialidades.json.
 // Las funciones son async para que el dia que se integre una base de datos
@@ -22,6 +23,10 @@ export const findAll = async (filters: EspecialidadFilters = {}): Promise<Especi
 
 export const findById = async (id: number): Promise<EspecialidadItem | undefined> =>
   especialidades.find((e) => e.id === id);
+
+/** Busca por nombre ignorando mayusculas y tildes ("pediatria" == "Pediatría"). */
+export const findByNombre = async (nombre: string): Promise<EspecialidadItem | undefined> =>
+  especialidades.find((e) => comparisonKey(e.nombre) === comparisonKey(nombre));
 
 export const create = async (data: CreateEspecialidadInput): Promise<EspecialidadItem> => {
   const nueva: EspecialidadItem = { id: nextId++, ...data };

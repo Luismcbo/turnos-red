@@ -29,7 +29,7 @@ export function normalizePaciente(rawPaciente: string): string {
 }
 
 /** Clave de comparacion: sin tildes, en minusculas y con espacios colapsados. */
-function comparisonKey(value: string): string {
+export function comparisonKey(value: string): string {
   return value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
