@@ -6,7 +6,8 @@
     "especialidad": "PEDIATRÍA",
     "fecha": "14/08/2026",
     "hora": "10.00",
-    "confirmado": "si"
+    "confirmado": "si",
+    "medicoId": 1
   },
   {
     "id": 103,
@@ -15,7 +16,8 @@
     "especialidad": "clinica medica",
     "fecha": "2026-08-15",
     "hora": "09:30",
-    "confirmado": true
+    "confirmado": true,
+    "medicoId": "4"
   },
   {
     "id": "104",
@@ -25,7 +27,8 @@
     "fecha": "16/08/2026",
     "hora": "14.30",
     "confirmado": "no",
-    "observaciones": "Paciente con alergia a la lidocaina"
+    "observaciones": "Paciente con alergia a la lidocaina",
+    "medicoId": 2
   },
   {
     "id": "105",
@@ -34,7 +37,8 @@
     "especialidad": "Nutrición",
     "fecha": "17/08/2026",
     "hora": "11.15",
-    "confirmado": "SI"
+    "confirmado": "SI",
+    "medicoId": 3
   },
   {
     "id": "0",

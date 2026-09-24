@@ -46,6 +46,9 @@ const confirmadoSchema = z
 
 const observacionesSchema = z.string().trim().max(500);
 
+/** Id del medico asignado. En PUT, null desvincula al medico del turno. */
+const medicoIdSchema = z.number().int().positive();
+
 /** Cuerpo de POST /turnos. Campos desconocidos se rechazan (evita typos silenciosos). */
 export const createTurnoSchema = z.strictObject({
   paciente: pacienteSchema,
@@ -55,6 +58,7 @@ export const createTurnoSchema = z.strictObject({
   hora: horaSchema,
   confirmado: confirmadoSchema.default(false),
   observaciones: observacionesSchema.optional(),
+  medicoId: medicoIdSchema.optional(),
 });
 
 /** Cuerpo de PUT /turnos/:id: actualiza los campos enviados (al menos uno). */
@@ -67,6 +71,7 @@ export const updateTurnoSchema = z
     hora: horaSchema,
     confirmado: confirmadoSchema,
     observaciones: observacionesSchema,
+    medicoId: medicoIdSchema.nullable(),
   })
   .partial()
   .refine((body) => Object.keys(body).length > 0, {

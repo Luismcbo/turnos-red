@@ -4,6 +4,7 @@ import express, { type Express } from 'express';
 import './config/zod.js';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import { zodErrorHandler } from './middlewares/zodErrorHandler.js';
+import medicoRoutes from './routes/medico.routes.js';
 import turnoRoutes from './routes/turno.routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,6 +17,7 @@ export function createApp(): Express {
   app.use(express.static(publicDir));
 
   app.use('/turnos', turnoRoutes);
+  app.use('/medicos', medicoRoutes);
 
   // Cadena de errores (siempre al final): 404 -> ZodError -> formato estandar.
   app.use(notFoundHandler);

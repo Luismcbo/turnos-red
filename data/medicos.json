@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "nombre": "Laura",
+    "apellido": "Benítez",
+    "matricula": "MP-1001",
+    "especialidad": "Pediatría",
+    "disponible": true,
+    "email": "laura.benitez@turnosred.test"
+  },
+  {
+    "id": 2,
+    "nombre": "Martín",
+    "apellido": "Suárez",
+    "matricula": "MP-1002",
+    "especialidad": "Odontología",
+    "disponible": true,
+    "email": "martin.suarez@turnosred.test"
+  },
+  {
+    "id": 3,
+    "nombre": "Sofía",
+    "apellido": "Ledesma",
+    "matricula": "MP-1003",
+    "especialidad": "Nutrición",
+    "disponible": false
+  },
+  {
+    "id": 4,
+    "nombre": "Ricardo",
+    "apellido": "Paz",
+    "matricula": "MP-1004",
+    "especialidad": "Clínica médica",
+    "disponible": true
+  },
+  {
+    "id": 5,
+    "nombre": "Ana",
+    "apellido": "Rossi",
+    "matricula": "MP-1005",
+    "especialidad": "Pediatría",
+    "disponible": false,
+    "email": "ana.rossi@turnosred.test"
+  }
+]

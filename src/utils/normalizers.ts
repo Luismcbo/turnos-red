@@ -132,6 +132,12 @@ export function normalizeTurnoFields(raw: Omit<TurnoCrudo, 'id'>): CreateTurnoIn
     data.observaciones = raw.observaciones.trim();
   }
 
+  if (raw.medicoId !== undefined && raw.medicoId !== null && raw.medicoId !== '') {
+    const medicoId = normalizeId(raw.medicoId);
+    if (medicoId === null) return null;
+    data.medicoId = medicoId;
+  }
+
   return data;
 }
 

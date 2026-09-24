@@ -1,6 +1,6 @@
 import type { Server as HttpServer } from 'node:http';
 import { Server as SocketIOServer } from 'socket.io';
-import { turnoEventBus } from '../events/turnoEventBus.js';
+import { eventBus } from '../events/eventBus.js';
 
 /**
  * Conecta Socket.IO al servidor HTTP de Express y lo suscribe al bus de
@@ -20,15 +20,15 @@ export function setupSocket(httpServer: HttpServer): SocketIOServer {
     });
   });
 
-  turnoEventBus.on('turno:creado', (turno) => {
+  eventBus.on('turno:creado', (turno) => {
     io.emit('turno:nuevo', turno);
   });
 
-  turnoEventBus.on('turno:actualizado', (turno) => {
+  eventBus.on('turno:actualizado', (turno) => {
     io.emit('turno:actualizado', turno);
   });
 
-  turnoEventBus.on('turno:eliminado', (turno) => {
+  eventBus.on('turno:eliminado', (turno) => {
     io.emit('turno:eliminado', turno);
   });
 

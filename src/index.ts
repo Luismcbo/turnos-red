@@ -2,9 +2,11 @@ import { createServer } from 'node:http';
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { setupSocket } from './sockets/socket.js';
+import { initMedicos } from './services/medico.service.js';
 import { initTurnos } from './services/turno.service.js';
 
 async function main(): Promise<void> {
+  await initMedicos();
   await initTurnos();
 
   const app = createApp();

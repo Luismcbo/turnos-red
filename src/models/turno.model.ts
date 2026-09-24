@@ -13,6 +13,7 @@ export interface TurnoCrudo {
   hora: string;
   confirmado: string | boolean;
   observaciones?: string;
+  medicoId?: string | number | null;
 }
 
 /**
@@ -30,10 +31,14 @@ export interface Turno {
   hora: string;
   confirmado: boolean;
   observaciones?: string;
+  /** Medico asignado (opcional). Referencia a Medico.id. */
+  medicoId?: number;
 }
 
 /** Datos aceptados al crear un turno (sin id, lo asigna el servicio). */
 export type CreateTurnoInput = Omit<Turno, 'id'>;
 
-/** Datos aceptados al actualizar un turno (todos los campos opcionales). */
-export type UpdateTurnoInput = Partial<Omit<Turno, 'id'>>;
+/** Datos aceptados al actualizar un turno (todos opcionales; medicoId null desvincula al medico). */
+export type UpdateTurnoInput = Partial<Omit<Turno, 'id' | 'medicoId'>> & {
+  medicoId?: number | null;
+};
