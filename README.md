@@ -12,6 +12,7 @@ por **Socket.IO** cada vez que se crea, actualiza o elimina un turno.
   Informe técnico: [docs/evidencia/informe-tecnico-turnosred.pdf](docs/evidencia/informe-tecnico-turnosred.pdf)
 - **Actividad 2** (esta versión): refactor de errores, recurso Médico, validación con Zod,
   filtros por query params y colección de Postman.
+  Informe técnico: [docs/actividad-2/informe-tecnico-actividad-2.pdf](docs/actividad-2/informe-tecnico-actividad-2.pdf)
 
 ## Requisitos previos
 
