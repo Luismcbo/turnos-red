@@ -1,11 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { AppError } from '../errors/AppError.js';
 
-/** Ruta inexistente: se convierte en un NOT_FOUND estandar. */
-export function notFoundHandler(req: Request, _res: Response, next: NextFunction): void {
-  next(AppError.notFound(`Ruta no encontrada: ${req.method} ${req.originalUrl}`));
-}
-
 /** Convierte cualquier error conocido/desconocido en un AppError. */
 function toAppError(error: unknown): AppError {
   if (error instanceof AppError) return error;

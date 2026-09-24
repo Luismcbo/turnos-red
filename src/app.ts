@@ -2,7 +2,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { type Express } from 'express';
 import './config/zod.js';
-import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
+import * as generalController from './controllers/general.controller.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 import { zodErrorHandler } from './middlewares/zodErrorHandler.js';
 import especialidadesRoutes from './routes/especialidades.routes.js';
 import medicoRoutes from './routes/medico.routes.js';
@@ -18,9 +19,7 @@ export function createApp(): Express {
   app.use(express.json());
 
   // Bienvenida (GET /). El cliente de prueba de Socket.IO pasa a servirse en /socket-client/.
-  app.get('/', (_req, res) => {
-    res.json({ message: 'Hello World - API de TurnosRed' });
-  });
+  app.get('/', generalController.hello);
   app.use('/socket-client', express.static(publicDir));
 
   app.use('/turnos', turnoRoutes);
@@ -28,8 +27,8 @@ export function createApp(): Express {
   app.use('/especialidades', especialidadesRoutes);
   app.use('/profesionales', profesionalesRoutes);
 
-  // Cadena de errores (siempre al final): 404 -> ZodError -> formato estandar.
-  app.use(notFoundHandler);
+  // Final de la cadena: 404 (controller general) -> ZodError -> errores restantes.
+  app.use(generalController.notFound);
   app.use(zodErrorHandler);
   app.use(errorHandler);
 
