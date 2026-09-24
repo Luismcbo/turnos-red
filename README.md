@@ -16,6 +16,7 @@ por **Socket.IO** cada vez que se crea, actualiza o elimina un turno.
 - **Actividad 3**: Especialidades y Profesionales refactorizados a **Clean Architecture** (controllers `async`
   por entidad, servicios, validaciones previas con retorno anticipado y códigos de estado dinámicos).
   Ver [Controllers async y códigos de estado dinámicos](#controllers-async-y-códigos-de-estado-dinámicos).
+  Informe técnico: [docs/actividad-3/informe-tecnico-actividad-3.pdf](docs/actividad-3/informe-tecnico-actividad-3.pdf)
 
 ## Requisitos previos
 
