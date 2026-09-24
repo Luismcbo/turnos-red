@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "483482d0-4283-414b-8c3f-b8b9aa8cb9c2",
     "name": "TurnosRed API",
-    "description": "Coleccion de la Actividad 2 de TurnosRed (Turnos + Médicos).\n\n- Importar junto con `turnos-red.postman_environment.json` y seleccionar el environment \"TurnosRed - Local\".\n- Ejecutar con el Collection Runner en orden: la carpeta 1 crea un médico (guarda `medicoId`), la 2 crea un turno vinculado (guarda `turnoId`), la 3 limpia, la 4 y 5 cubren Especialidades y Profesionales (guardan `especialidadId` y `profesionalId`) y la 6 limpia.\n- Cada request incluye tests (status code + esquema JSON) y un ejemplo guardado (Saved Response) listo para usarse como Mock Server.\n- Formato de error de toda la API: `{ \"status\", \"message\", \"code\", \"details\": [] }`.",
+    "description": "Coleccion de la Actividad 2 de TurnosRed (Turnos + Médicos).\n\n- Todas las URLs usan la variable `{{baseUrl}}` (por defecto `http://localhost:3000`, el `PORT` del `.env`); para apuntar a otro servidor o a un Mock Server basta cambiar esa variable en el environment.\n- Importar junto con `turnos-red.postman_environment.json` y seleccionar el environment \"TurnosRed - Local\".\n- Ejecutar con el Collection Runner en orden: la carpeta 1 crea un médico (guarda `medicoId`), la 2 crea un turno vinculado (guarda `turnoId`), la 3 limpia, la 4 y 5 cubren Especialidades y Profesionales (guardan `especialidadId` y `profesionalId`) y la 6 limpia.\n- Cada request incluye tests (status code + esquema JSON) y un ejemplo guardado (Saved Response) listo para usarse como Mock Server.\n- Formato de error de toda la API: `{ \"status\", \"message\", \"code\", \"details\": [] }`.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -46,8 +46,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/",
+                  "host": ["{{baseUrl}}"],
                   "path": []
                 }
               },
@@ -157,8 +157,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/medicos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos"]
                 }
               },
@@ -220,8 +220,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos"]
                 }
               },
@@ -295,8 +295,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos?especialidad=Pediatria&disponible=true",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos?especialidad=Pediatria&disponible=true",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos"],
                   "query": [
                     {
@@ -367,8 +367,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "6"]
                 }
               },
@@ -462,8 +462,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/medicos/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "6"]
                 }
               },
@@ -565,8 +565,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/medicos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos"]
                 }
               },
@@ -664,8 +664,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/medicos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos"]
                 }
               },
@@ -740,8 +740,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos?disponible=quizas",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos?disponible=quizas",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos"],
                   "query": [
                     {
@@ -816,8 +816,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos/abc",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/abc",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "abc"]
                 }
               },
@@ -881,8 +881,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "999999"]
                 }
               },
@@ -975,8 +975,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/medicos/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "999999"]
                 }
               },
@@ -1090,8 +1090,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"]
                 }
               },
@@ -1153,8 +1153,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"]
                 }
               },
@@ -1236,8 +1236,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos?especialidad=Pediatria&fecha=14/08/2026&medicoId=6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos?especialidad=Pediatria&fecha=14/08/2026&medicoId=6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"],
                   "query": [
                     {
@@ -1312,8 +1312,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos/106",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/106",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "106"]
                 }
               },
@@ -1409,8 +1409,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos/106",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/106",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "106"]
                 }
               },
@@ -1513,8 +1513,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"]
                 }
               },
@@ -1612,8 +1612,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"]
                 }
               },
@@ -1712,8 +1712,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"]
                 }
               },
@@ -1806,8 +1806,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"]
                 }
               },
@@ -1889,8 +1889,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos?especialidad=Cardiologia&fecha=32/13/2026&medicoId=abc",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos?especialidad=Cardiologia&fecha=32/13/2026&medicoId=abc",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos"],
                   "query": [
                     {
@@ -1998,8 +1998,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos/106",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/106",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "106"]
                 }
               },
@@ -2062,8 +2062,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "999999"]
                 }
               },
@@ -2156,8 +2156,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/turnos/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "999999"]
                 }
               },
@@ -2207,8 +2207,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos/106",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/106",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "106"]
                 }
               },
@@ -2266,8 +2266,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos/106",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/106",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "106"]
                 }
               },
@@ -2330,8 +2330,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/turnos/106",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/turnos/106",
+                  "host": ["{{baseUrl}}"],
                   "path": ["turnos", "106"]
                 }
               },
@@ -2387,8 +2387,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "6"]
                 }
               },
@@ -2446,8 +2446,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "6"]
                 }
               },
@@ -2510,8 +2510,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/medicos/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/medicos/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["medicos", "6"]
                 }
               },
@@ -2575,8 +2575,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/ruta-inexistente",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/ruta-inexistente",
+                  "host": ["{{baseUrl}}"],
                   "path": ["ruta-inexistente"]
                 }
               },
@@ -2640,8 +2640,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"]
                 }
               },
@@ -2706,8 +2706,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades?nombre=pedia",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades?nombre=pedia",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"],
                   "query": [
                     {
@@ -2820,8 +2820,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"]
                 }
               },
@@ -2882,8 +2882,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/5",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/5",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "5"]
                 }
               },
@@ -2976,8 +2976,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/5",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/5",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "5"]
                 }
               },
@@ -3075,8 +3075,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"]
                 }
               },
@@ -3174,8 +3174,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"]
                 }
               },
@@ -3273,8 +3273,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"]
                 }
               },
@@ -3367,8 +3367,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"]
                 }
               },
@@ -3442,8 +3442,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades?nombre=",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades?nombre=",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades"],
                   "query": [
                     {
@@ -3517,8 +3517,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/abc",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/abc",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "abc"]
                 }
               },
@@ -3582,8 +3582,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "999999"]
                 }
               },
@@ -3677,8 +3677,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "999999"]
                 }
               },
@@ -3776,8 +3776,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/5",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/5",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "5"]
                 }
               },
@@ -3841,8 +3841,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "999999"]
                 }
               },
@@ -3948,8 +3948,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"]
                 }
               },
@@ -4010,8 +4010,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"]
                 }
               },
@@ -4086,8 +4086,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales?especialidadId=5&activo=true&apellido=fernand",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales?especialidadId=5&activo=true&apellido=fernand",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"],
                   "query": [
                     {
@@ -4162,8 +4162,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "6"]
                 }
               },
@@ -4256,8 +4256,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "6"]
                 }
               },
@@ -4355,8 +4355,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"]
                 }
               },
@@ -4454,8 +4454,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"]
                 }
               },
@@ -4553,8 +4553,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"]
                 }
               },
@@ -4652,8 +4652,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"]
                 }
               },
@@ -4751,8 +4751,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "6"]
                 }
               },
@@ -4850,8 +4850,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "6"]
                 }
               },
@@ -4929,8 +4929,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales?especialidadId=abc&activo=quizas",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales?especialidadId=abc&activo=quizas",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales"],
                   "query": [
                     {
@@ -5008,8 +5008,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/abc",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/abc",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "abc"]
                 }
               },
@@ -5073,8 +5073,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "999999"]
                 }
               },
@@ -5168,8 +5168,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "999999"]
                 }
               },
@@ -5233,8 +5233,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/999999",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/999999",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "999999"]
                 }
               },
@@ -5304,8 +5304,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/5",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/5",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "5"]
                 }
               },
@@ -5355,8 +5355,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "6"]
                 }
               },
@@ -5415,8 +5415,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "6"]
                 }
               },
@@ -5480,8 +5480,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/profesionales/6",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/profesionales/6",
+                  "host": ["{{baseUrl}}"],
                   "path": ["profesionales", "6"]
                 }
               },
@@ -5531,8 +5531,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/5",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/5",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "5"]
                 }
               },
@@ -5591,8 +5591,8 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/5",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/5",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "5"]
                 }
               },
@@ -5656,8 +5656,8 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/especialidades/5",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/especialidades/5",
+                  "host": ["{{baseUrl}}"],
                   "path": ["especialidades", "5"]
                 }
               },
@@ -5751,8 +5751,8 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/ruta-que-no-existe",
-                  "host": ["http://localhost:3000"],
+                  "raw": "{{baseUrl}}/ruta-que-no-existe",
+                  "host": ["{{baseUrl}}"],
                   "path": ["ruta-que-no-existe"]
                 }
               },
